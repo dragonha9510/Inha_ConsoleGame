@@ -41,9 +41,13 @@ enum MENU_ENUM { PLAY = 0, LOAD, CHALLENGE, MENUEND , MENU, ENUM_END };
 extern char chMessage = '\0';
 
 #include "Console_Func.h"
+#include "FileIO.h"
+#include "_Player.h"
 #include "MainMenu.h"
 #include "Dungeon.h"
+#include "SaveLoad.h"
 
 #include "Maingame.h"
+
 
 #endif // __STDAFX_H__

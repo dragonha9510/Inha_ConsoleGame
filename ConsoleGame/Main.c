@@ -1,6 +1,5 @@
 #include "stdafx.h"
 
-
 int main()
 {
 	system("mode con lines=40 cols=150");

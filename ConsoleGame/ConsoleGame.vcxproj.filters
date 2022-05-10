@@ -5,14 +5,6 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="헤더 파일">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
-    <Filter Include="리소스 파일">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
     <Filter Include="소스 파일\0.Main">
       <UniqueIdentifier>{4495b6cd-4f45-42a1-a35c-b5edfcada5d1}</UniqueIdentifier>
     </Filter>
@@ -25,13 +17,24 @@
     <Filter Include="소스 파일\2.Object">
       <UniqueIdentifier>{ba647cb1-1437-49b8-8a56-aac69d8d4c0d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\99.Default\리소스 파일">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="소스 파일\99.Default\헤더 파일">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="소스 파일\3.Tool">
+      <UniqueIdentifier>{1ed23993-162e-457b-a943-039744ed0c60}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Console_Func.h">
-      <Filter>소스 파일\99.Default</Filter>
-    </ClCompile>
     <ClCompile Include="Main.c">
       <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Console_Func.h">
+      <Filter>소스 파일\3.Tool</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -46,6 +49,15 @@
     </ClInclude>
     <ClInclude Include="Dungeon.h">
       <Filter>소스 파일\1.Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="SaveLoad.h">
+      <Filter>소스 파일\1.Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="_Player.h">
+      <Filter>소스 파일\2.Object</Filter>
+    </ClInclude>
+    <ClInclude Include="FileIO.h">
+      <Filter>소스 파일\3.Tool</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
