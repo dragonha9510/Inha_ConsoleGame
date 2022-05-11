@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <time.h>
 
 #include <vld.h>
 
@@ -28,7 +29,10 @@ extern HANDLE g_COUT = 0;		// console Output
 
 #define _ERROR		-1
 #define _EXIT		-2
+#define _FALSE		0
 #define _TRUE		1
+#define _OK			0
+#define _FAIL		1
 
 #define IFERROREXIT(t)		if(t == _ERROR) exit(-1);
 #define IFERRORRETURN(t)	(t == _ERROR) ? 1 : 0
@@ -36,10 +40,16 @@ extern HANDLE g_COUT = 0;		// console Output
 #define NULLCHECK(t)		if(t == NULL) exit(-1);
 #define NULLCHECKRETURN(t)	(t == NULL) ? 1 : 0
 
+#define NULLCHECKFREE(t) if(!NULLCHECKRETURN(t)) free(t); t = NULL;
+
+#define MAXBUFFER	255
+#define DOUBLE(t)	t * 2
+
 enum MENU_ENUM { PLAY = 0, LOAD, CHALLENGE, MENUEND , MENU, ENUM_END };
 
 extern char chMessage = '\0';
 
+#include "Card.h"
 #include "Console_Func.h"
 #include "FileIO.h"
 #include "_Player.h"

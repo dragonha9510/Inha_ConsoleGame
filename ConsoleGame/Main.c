@@ -5,6 +5,8 @@ int main()
 	system("mode con lines=40 cols=150");
 	system("title Slay the Spire");
 
+	srand((unsigned int)time(NULL));
+
 	g_CIN = GetStdHandle(STD_INPUT_HANDLE);
 	g_COUT = GetStdHandle(STD_OUTPUT_HANDLE);
 	CONSOLE_CURSOR_INFO ConsoleCursor;

@@ -106,4 +106,21 @@ int GetKeyInputMessage()
 
 	return chMessage;
 }
+
+int CheckBlink(int* time, int blinktime)
+{
+	if (!(*time))
+		(*time) = (int)GetTickCount64();
+
+	if ((int)GetTickCount64() - (*time) < blinktime)
+		return 1;
+	else if ((int)GetTickCount64() - (*time) > DOUBLE(blinktime))
+	{
+		(*time) = 0;
+		return 1;
+	}
+	else
+		return 0;
+}
+
 #endif // _CONSOLE_FUNC_

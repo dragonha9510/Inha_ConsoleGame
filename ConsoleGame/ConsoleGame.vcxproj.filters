@@ -59,5 +59,8 @@
     <ClInclude Include="FileIO.h">
       <Filter>소스 파일\3.Tool</Filter>
     </ClInclude>
+    <ClInclude Include="Card.h">
+      <Filter>소스 파일\2.Object</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

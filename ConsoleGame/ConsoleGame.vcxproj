@@ -143,6 +143,7 @@
     <ClCompile Include="Main.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Card.h" />
     <ClInclude Include="Dungeon.h" />
     <ClInclude Include="FileIO.h" />
     <ClInclude Include="Maingame.h" />

@@ -2,10 +2,15 @@
 
 #include "stdafx.h"
 
+#define MENUCURSORX		26
+#define MENUCURSORY		28
+#define MENUINTERVAL	26
+
 typedef struct MAINMENU
 {
 	int m_iCursorPos;
-	int m_iCursorBlink;
+	int m_iCursorBlinkTime;
+	bool m_bRender;
 }CMainMenu;
 
 int MenuUpdate(CMainMenu* mainmenu)
@@ -17,12 +22,12 @@ int MenuUpdate(CMainMenu* mainmenu)
 		switch (chMessage)
 		{
 		case LEFT:
-			gotoxy(26 + (mainmenu->m_iCursorPos * 26), 28);
+			gotoxy(MENUCURSORX + (mainmenu->m_iCursorPos * MENUINTERVAL), MENUCURSORY);
 			printf("  ");
 			--(mainmenu->m_iCursorPos);
 			break;
 		case RIGHT:
-			gotoxy(26 + (mainmenu->m_iCursorPos * 26), 28);
+			gotoxy(MENUCURSORX + (mainmenu->m_iCursorPos * MENUINTERVAL), MENUCURSORY);
 			printf("  ");
 			++(mainmenu->m_iCursorPos);
 			break;
@@ -30,7 +35,7 @@ int MenuUpdate(CMainMenu* mainmenu)
 			return _ERROR;
 			break;
 		}
-		mainmenu->m_iCursorBlink = TRUE;
+		mainmenu->m_iCursorBlinkTime = 0;
 
 		if (mainmenu->m_iCursorPos < PLAY)
 			mainmenu->m_iCursorPos = MENUEND;
@@ -45,24 +50,22 @@ int MenuUpdate(CMainMenu* mainmenu)
 
 int MenuLateUpdate(CMainMenu* mainmenu)
 {
-	gotoxy(26 + (mainmenu->m_iCursorPos * 26), 28);
-	if (mainmenu->m_iCursorBlink)
-	{
-		printf("¢º");
-		mainmenu->m_iCursorBlink = false;
-	}
-	else
-	{
-		printf("¢¹");
-		mainmenu->m_iCursorBlink = true;
-	}
+	gotoxy(MENUCURSORX + (mainmenu->m_iCursorPos * MENUINTERVAL), MENUCURSORY);
 
 	return _TRUE;
 }
 
 int MenuRender(CMainMenu* mainmenu)
 {
-	PrintASCIIImage("Menu.txt");
+	if (CheckBlink(&(mainmenu->m_iCursorBlinkTime), 300))
+		printf("¢º");
+	else
+		printf("¢¹");
 
 	return _TRUE;
+}
+
+void MenuBaseRender()
+{
+	PrintASCIIImage("Menu.txt");
 }
