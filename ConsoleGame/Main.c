@@ -5,6 +5,7 @@ int main()
 	system("mode con lines=40 cols=150");
 	system("title Slay the Spire");
 
+
 	srand((unsigned int)time(NULL));
 
 	g_CIN = GetStdHandle(STD_INPUT_HANDLE);
@@ -22,6 +23,7 @@ int main()
 
 	memset(pMain, 0, sizeof(CMainGame));
 	//
+	textcolor(WHITE);
 
 	IFERROREXIT(InitMain(pMain));
 

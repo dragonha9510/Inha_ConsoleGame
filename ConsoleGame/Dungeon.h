@@ -3,10 +3,10 @@
 #include "stdafx.h"
 
 #define CARDCURSORX		10
-#define CARDCURSORY		5
-#define CARDINTERVAL	2
+#define CARDCURSORY		7
+#define CARDINTERVAL	4
 #define CARDMINNUM		0
-#define CARDMAXNUM		9
+#define CARDMAXNUM		4
 
 typedef struct Dungeon
 {
@@ -18,6 +18,8 @@ typedef struct Dungeon
 
 int InitDungeon(CDungeon* dungeon)
 {
+	//dungeon->m_iCursorPos = 0;
+
 	if (NULLCHECKRETURN(dungeon->m_pPlayer))
 	{
 		dungeon->m_pPlayer = (CPlayer*)malloc(sizeof(CPlayer));
@@ -28,6 +30,7 @@ int InitDungeon(CDungeon* dungeon)
 		memset(dungeon->m_pPlayer, 0, sizeof(CPlayer));
 
 		InitPlayer(dungeon->m_pPlayer);
+		dungeon->m_pPlayer->m_iCursorPos = dungeon->m_iCursorPos;
 	}
 
 	return _OK;
@@ -60,16 +63,24 @@ int DungeonUpdate(CDungeon* dungeon)
 		else if (dungeon->m_iCursorPos > CARDMAXNUM)
 			dungeon->m_iCursorPos = CARDMINNUM;
 	}
-	else if (chMessage == ENTER || chMessage == SPACE)
+	else if (chMessage == ENTER)
 	{
 		return MENU;
 	}
+
+	PlayerUpdate(dungeon->m_pPlayer);
 
 	return PLAY;
 }
 
 int DungeonLateUpdate(CDungeon* dungeon)
 {
+	if (dungeon->m_pPlayer->m_iCursorPos != dungeon->m_iCursorPos)
+	{
+		dungeon->m_pPlayer->m_iCursorPos = dungeon->m_iCursorPos;
+		dungeon->m_pPlayer->m_bChangeCard = true;
+	}
+
 	gotoxy(CARDCURSORX, CARDCURSORY + (dungeon->m_iCursorPos * CARDINTERVAL));
 
 	return _TRUE;
@@ -81,6 +92,12 @@ int DungeonRender(CDungeon* dungeon)
 		printf("¢º");
 	else
 		printf("¢¹");
+
+	if (dungeon->m_pPlayer->m_bChangeCard)
+	{
+		PlayerRender(dungeon->m_pPlayer);
+		dungeon->m_pPlayer->m_bChangeCard = false;
+	}
 
 	if (!dungeon->m_pPlayer->m_bRender)
 	{

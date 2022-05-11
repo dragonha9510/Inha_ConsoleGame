@@ -23,9 +23,16 @@ typedef struct Player
 	int m_iMaxHP;
 	int m_iCost;
 	int m_iCard;
+
+	int m_iCursorPos;
+
 	CCard* m_pCard;
 	CCard* m_pAllCard;
+	CCard* m_HandCard[5];
 
+	bool m_bChangeCard;
+	bool m_bHandChange;
+	bool m_bUseCard[5];
 	bool m_bRender;
 }CPlayer;
 
@@ -47,11 +54,47 @@ int InitPlayer(CPlayer* player)
 	player->m_iMaxHP = 100;
 	player->m_iCost = 3;
 
+	player->m_bHandChange = true;
+
+	int arr[5] = { -1, -1, -1, -1, -1 };
+	bool SameNum = false;
+
+	for (int i = 0; i < 5;)
+	{
+		int iCnt = rand() % 10;
+
+		for (int j = 0; j < 5; ++j)
+		{
+			if (arr[j] == iCnt)
+			{
+				SameNum = true;
+				break;
+			}
+		}
+
+		if (SameNum)
+		{
+			SameNum = false;
+			continue;
+		}
+
+		arr[i] = iCnt;
+		player->m_HandCard[i] = (player->m_pCard + arr[i]);
+		++i;
+	}
+
+	player->m_bChangeCard = true;
+
 	return _TRUE;
 }
 
 int PlayerUpdate(CPlayer* player)
 {
+	if (chMessage == SPACE)
+	{
+		player->m_bUseCard[player->m_iCursorPos] = true;
+		player->m_bChangeCard = true;
+	}
 	return _TRUE;
 }
 
@@ -62,6 +105,13 @@ int PlayerLateUpdate(CPlayer* player)
 
 int PlayerRender(CPlayer* player)
 {
+	if (player->m_bHandChange || player->m_bChangeCard)
+	{
+		PrintCardName(player->m_HandCard, 5, player->m_bUseCard);
+		player->m_bHandChange = false;
+	}
+
+	PrintCardInfo(*(player->m_HandCard[player->m_iCursorPos]));
 
 	return _TRUE;
 }

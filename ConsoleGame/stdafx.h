@@ -49,8 +49,9 @@ enum MENU_ENUM { PLAY = 0, LOAD, CHALLENGE, MENUEND , MENU, ENUM_END };
 
 extern char chMessage = '\0';
 
-#include "Card.h"
 #include "Console_Func.h"
+
+#include "Card.h"
 #include "FileIO.h"
 #include "_Player.h"
 #include "MainMenu.h"
