@@ -12,9 +12,15 @@
 #define CARDPOSX			10
 #define FIRSTCARDPOSY		5
 
+#define HANDCOUNT			5
+
 typedef struct Player
 {
 	char m_chName[MAXBUFFER];
+
+	int m_iOriForce;
+	int m_iOrishiled;
+	int m_iOriMaxHp;
 
 	int m_iForce;
 	int m_iShiled;
@@ -22,19 +28,47 @@ typedef struct Player
 	int m_iGold;
 	int m_iMaxHP;
 	int m_iCost;
+	int m_iMaxCost;
+
 	int m_iCard;
+	int m_iHandCard;
 
 	int m_iCursorPos;
 
 	CCard* m_pCard;
 	CCard* m_pAllCard;
-	CCard* m_HandCard[5];
+	CCard* m_HandCard[HANDCOUNT];
+
+	int m_iUseCardType;
 
 	bool m_bChangeCard;
 	bool m_bHandChange;
-	bool m_bUseCard[5];
+	bool m_bUseCard[HANDCOUNT];
 	bool m_bRender;
 }CPlayer;
+
+int CheckWithCard(CPlayer* player, CCard card)
+{
+	player->m_iUseCardType = card.m_iCardType;
+	switch (card.m_iCardType)
+	{
+	case SHILED:
+		player->m_iShiled += card.m_iShiled;
+		break;
+	case BUFF:
+		break;
+	case SHUFFLE:
+		break;
+	case PLUSCOST:
+		break;
+	default:
+		return _TRUE;
+	}
+
+	player->m_bRender = false;
+
+	return _TRUE;
+}
 
 int InitPlayer(CPlayer* player)
 {
@@ -47,23 +81,27 @@ int InitPlayer(CPlayer* player)
 	player->m_iCard = PLAYERSTARTCARD;
 
 	strcpy(player->m_chName, "TESTPLAYER");
-	player->m_iForce = 5;
-	player->m_iShiled = 0;
+	player->m_iForce = player->m_iOriForce = 5;
+	player->m_iShiled = player->m_iOrishiled = 0;
 	player->m_iHP = 100;
 	player->m_iGold = 0;
-	player->m_iMaxHP = 100;
+	player->m_iMaxHP = player->m_iOriMaxHp = 100;
 	player->m_iCost = 3;
-
+	player->m_iMaxCost = 3;
 	player->m_bHandChange = true;
 
-	int arr[5] = { -1, -1, -1, -1, -1 };
+	player->m_iHandCard = HANDCOUNT;
+
+	int arr[10];
+
+	memset(arr, -1, sizeof(arr));
 	bool SameNum = false;
 
-	for (int i = 0; i < 5;)
+	for (int i = 0; i < player->m_iHandCard;)
 	{
-		int iCnt = rand() % 10;
+		int iCnt = rand() % PLAYERSTARTCARD;
 
-		for (int j = 0; j < 5; ++j)
+		for (int j = 0; j < player->m_iHandCard; ++j)
 		{
 			if (arr[j] == iCnt)
 			{
@@ -92,8 +130,13 @@ int PlayerUpdate(CPlayer* player)
 {
 	if (chMessage == SPACE)
 	{
-		player->m_bUseCard[player->m_iCursorPos] = true;
-		player->m_bChangeCard = true;
+		if (!player->m_bUseCard[player->m_iCursorPos])
+		{
+			player->m_bUseCard[player->m_iCursorPos] = true;
+			player->m_iCost -= (player->m_HandCard[player->m_iCursorPos])->m_iCost;
+			player->m_bChangeCard = true;
+			CheckWithCard(player, *(player->m_HandCard[player->m_iCursorPos]));
+		}
 	}
 	return _TRUE;
 }
@@ -107,7 +150,7 @@ int PlayerRender(CPlayer* player)
 {
 	if (player->m_bHandChange || player->m_bChangeCard)
 	{
-		PrintCardName(player->m_HandCard, 5, player->m_bUseCard);
+		PrintCardName(player->m_HandCard, HANDCOUNT, player->m_bUseCard);
 		player->m_bHandChange = false;
 	}
 
@@ -127,11 +170,11 @@ int PlayerBaseRender(CPlayer* player)
 	gotoxy(x, y++);
 	printf("%s", player->m_chName);
 	gotoxy(x, ++y);
-	printf("Str    : %d", player->m_iForce);
+	printf("Str    : %d (+%d)", player->m_iOriForce, player->m_iForce - player->m_iOriForce);
 	gotoxy(x + Xinterval, y);
 	printf("Gold  : %d", player->m_iGold);
 	gotoxy(x, ++y);
-	printf("Shield : %d", player->m_iShiled);
+	printf("Shield : %d (+%d)", player->m_iOrishiled, player->m_iShiled - player->m_iOrishiled);
 	gotoxy(x, ++y);
 	printf("Card   : %d", player->m_iCard);
 

@@ -4,7 +4,7 @@
 
 #define CARDCURSORX		10
 #define CARDCURSORY		7
-#define CARDINTERVAL	4
+#define CARDINTERVAL	20
 #define CARDMINNUM		0
 #define CARDMAXNUM		4
 
@@ -42,25 +42,26 @@ int DungeonUpdate(CDungeon* dungeon)
 	{
 		chMessage = _getch();
 
+		gotoxy(CARDCURSORX, CARDCURSORY + (dungeon->m_iCursorPos * (CARDINTERVAL / dungeon->m_pPlayer->m_iHandCard)));
+		printf("  ");
+
 		switch (chMessage)
 		{
 		case UP:
-			gotoxy(CARDCURSORX, CARDCURSORY + (dungeon->m_iCursorPos * CARDINTERVAL));
-			printf("  ");
 			--(dungeon->m_iCursorPos);
 			break;
 		case DOWN:
-			gotoxy(CARDCURSORX, CARDCURSORY + (dungeon->m_iCursorPos * CARDINTERVAL));
-			printf("  ");
 			++(dungeon->m_iCursorPos);
 			break;
+		case RIGHT:
+
 		default:
 			return _ERROR;
 		}
 
 		if (dungeon->m_iCursorPos < CARDMINNUM)
-			dungeon->m_iCursorPos = CARDMAXNUM;
-		else if (dungeon->m_iCursorPos > CARDMAXNUM)
+			dungeon->m_iCursorPos = dungeon->m_pPlayer->m_iHandCard - 1;
+		else if (dungeon->m_iCursorPos > dungeon->m_pPlayer->m_iHandCard - 1)
 			dungeon->m_iCursorPos = CARDMINNUM;
 	}
 	else if (chMessage == ENTER)
@@ -81,7 +82,7 @@ int DungeonLateUpdate(CDungeon* dungeon)
 		dungeon->m_pPlayer->m_bChangeCard = true;
 	}
 
-	gotoxy(CARDCURSORX, CARDCURSORY + (dungeon->m_iCursorPos * CARDINTERVAL));
+	gotoxy(CARDCURSORX, CARDCURSORY + (dungeon->m_iCursorPos * (CARDINTERVAL / dungeon->m_pPlayer->m_iHandCard)));
 
 	return _TRUE;
 }

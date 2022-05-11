@@ -2,6 +2,12 @@
 
 #include "stdafx.h"
 
+#define HANDCARDPOSX 15
+#define HANDCARDPOSY 7
+
+#define CARDINFOPOSX 7
+#define CARDINFOPOSY 34
+
 enum CARTTYPE { ATTACK, SHILED, BUFF, DEBUFF, SHUFFLE, PLUSCOST, CARDTYPE_END };
 
 typedef struct Card
@@ -61,7 +67,7 @@ int PrintCardName(CCard* card[], int cnt, bool arr[])
 {
 	for (int i = 0; i < cnt; ++i)
 	{
-		gotoxy(15, 7 + (4 * i));
+		gotoxy(HANDCARDPOSX, HANDCARDPOSY + (4 * i));
 		if (arr[i])
 			textcolor(RED);
 		printf("%s (%d)", card[i]->m_chCardName, card[i]->m_iCost);
@@ -74,10 +80,22 @@ int PrintCardName(CCard* card[], int cnt, bool arr[])
 
 int PrintCardInfo(CCard card)
 {
-	gotoxy(7, 33);
+	char chTempInfo[MAXBUFFER];
+
+	strcpy(chTempInfo, card.m_chCardInfo);
+
+	if (card.m_iCardType == ATTACK)
+	{
+		strcat(chTempInfo, " (으)로 공격한다.");
+	}
+	else if (card.m_iCardType == SHILED)
+	{
+		strcat(chTempInfo, " 만큼 증가한다.");
+	}
+	gotoxy(CARDINFOPOSX, CARDINFOPOSY);
 	printf("                                                                     ");
-	gotoxy(7, 33);
-	printf("%s", card.m_chCardInfo);
+	gotoxy(CARDINFOPOSX, CARDINFOPOSY);
+	printf("%s", chTempInfo);
 
 	return _TRUE;
 }
