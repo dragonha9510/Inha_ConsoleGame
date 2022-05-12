@@ -150,6 +150,7 @@
     <ClInclude Include="MainMenu.h" />
     <ClInclude Include="SaveLoad.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="Story.h" />
     <ClInclude Include="_Player.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

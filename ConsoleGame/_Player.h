@@ -13,6 +13,9 @@
 #define FIRSTCARDPOSY		5
 
 #define HANDCOUNT			5
+#define HANDCARDMAX			10
+
+int arr[HANDCARDMAX] = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
 
 typedef struct Player
 {
@@ -37,38 +40,20 @@ typedef struct Player
 
 	CCard* m_pCard;
 	CCard* m_pAllCard;
-	CCard* m_HandCard[HANDCOUNT];
+	CCard* m_HandCard[HANDCARDMAX];
 
 	int m_iUseCardType;
 
 	bool m_bChangeCard;
 	bool m_bHandChange;
-	bool m_bUseCard[HANDCOUNT];
+	bool m_bUseCard[HANDCARDMAX];
 	bool m_bRender;
 }CPlayer;
 
-int CheckWithCard(CPlayer* player, CCard card)
-{
-	player->m_iUseCardType = card.m_iCardType;
-	switch (card.m_iCardType)
-	{
-	case SHILED:
-		player->m_iShiled += card.m_iShiled;
-		break;
-	case BUFF:
-		break;
-	case SHUFFLE:
-		break;
-	case PLUSCOST:
-		break;
-	default:
-		return _TRUE;
-	}
-
-	player->m_bRender = false;
-
-	return _TRUE;
-}
+void ShuffleNewCard(CCard* handarr[], CCard* allcard, int cnt, int maxcardcnt);
+void AddNewCard(CCard* handarr[], CCard* allcard, int cnt, int maxcardcnt, int curcnt);
+int CheckWithCard(CPlayer* player, CCard card);
+void PlayerNewTurn(CPlayer* player);
 
 int InitPlayer(CPlayer* player)
 {
@@ -81,45 +66,19 @@ int InitPlayer(CPlayer* player)
 	player->m_iCard = PLAYERSTARTCARD;
 
 	strcpy(player->m_chName, "TESTPLAYER");
-	player->m_iForce = player->m_iOriForce = 5;
-	player->m_iShiled = player->m_iOrishiled = 0;
-	player->m_iHP = 100;
-	player->m_iGold = 0;
-	player->m_iMaxHP = player->m_iOriMaxHp = 100;
-	player->m_iCost = 3;
-	player->m_iMaxCost = 3;
-	player->m_bHandChange = true;
+
+	player->m_iForce	= player->m_iOriForce	= 5;
+	player->m_iShiled	= player->m_iOrishiled	= 0;
+	player->m_iMaxHP	= player->m_iOriMaxHp	= 100;
+	player->m_iHP								= 100;
+	player->m_iGold								= 0;
+	player->m_iCost								= 3;
+	player->m_iMaxCost							= 3;
+	player->m_bHandChange						= true;
 
 	player->m_iHandCard = HANDCOUNT;
 
-	int arr[10];
-
-	memset(arr, -1, sizeof(arr));
-	bool SameNum = false;
-
-	for (int i = 0; i < player->m_iHandCard;)
-	{
-		int iCnt = rand() % PLAYERSTARTCARD;
-
-		for (int j = 0; j < player->m_iHandCard; ++j)
-		{
-			if (arr[j] == iCnt)
-			{
-				SameNum = true;
-				break;
-			}
-		}
-
-		if (SameNum)
-		{
-			SameNum = false;
-			continue;
-		}
-
-		arr[i] = iCnt;
-		player->m_HandCard[i] = (player->m_pCard + arr[i]);
-		++i;
-	}
+	ShuffleNewCard(player->m_HandCard, player->m_pCard, HANDCOUNT, MAXCARDKINDS);
 
 	player->m_bChangeCard = true;
 
@@ -130,7 +89,8 @@ int PlayerUpdate(CPlayer* player)
 {
 	if (chMessage == SPACE)
 	{
-		if (!player->m_bUseCard[player->m_iCursorPos])
+		if (!player->m_bUseCard[player->m_iCursorPos]
+			&& player->m_iCost - (player->m_HandCard[player->m_iCursorPos])->m_iCost >= 0)
 		{
 			player->m_bUseCard[player->m_iCursorPos] = true;
 			player->m_iCost -= (player->m_HandCard[player->m_iCursorPos])->m_iCost;
@@ -150,7 +110,7 @@ int PlayerRender(CPlayer* player)
 {
 	if (player->m_bHandChange || player->m_bChangeCard)
 	{
-		PrintCardName(player->m_HandCard, HANDCOUNT, player->m_bUseCard);
+		PrintCardName(player->m_HandCard, player->m_iHandCard, player->m_bUseCard);
 		player->m_bHandChange = false;
 	}
 
@@ -176,7 +136,9 @@ int PlayerBaseRender(CPlayer* player)
 	gotoxy(x, ++y);
 	printf("Shield : %d (+%d)", player->m_iOrishiled, player->m_iShiled - player->m_iOrishiled);
 	gotoxy(x, ++y);
-	printf("Card   : %d", player->m_iCard);
+	printf("Card   : %d", player->m_iCard - player->m_iHandCard);
+	gotoxy(x + Xinterval, y);
+	printf("Cost   : %d / %d", player->m_iCost, player->m_iMaxCost);
 
 	return _TRUE;
 }
@@ -186,4 +148,125 @@ int ReleasePlayer(CPlayer* player)
 	NULLCHECKFREE(player->m_pAllCard);
 	NULLCHECKFREE(player->m_pCard);
 	return _TRUE;
+}
+
+int CheckWithCard(CPlayer* player, CCard card)
+{
+	player->m_iUseCardType = card.m_iCardType;
+	switch (card.m_iCardType)
+	{
+	case SHILED:
+		player->m_iShiled += card.m_iShiled;
+		break;
+	case BUFF:
+		break;
+	case SHUFFLE:
+		if (player->m_iHandCard == HANDCARDMAX)
+		{
+			player->m_bUseCard[player->m_iCursorPos] = false;
+			player->m_iCost += (player->m_HandCard[player->m_iCursorPos])->m_iCost;
+			player->m_bChangeCard = false;
+			return _TRUE;
+		}
+		AddNewCard(player->m_HandCard, player->m_pCard, card.m_iDmg, player->m_iCard, player->m_iHandCard);
+		player->m_iHandCard += card.m_iDmg;
+
+		if (player->m_iHandCard > HANDCARDMAX)
+			player->m_iHandCard = HANDCARDMAX;
+		break;
+	case PLUSCOST:
+		player->m_iCost += (player->m_HandCard[player->m_iCursorPos])->m_iCost * 2;
+		break;
+	default:
+		break;
+	}
+
+	player->m_bRender = false;
+
+	return _TRUE;
+}
+
+void ShuffleNewCard(CCard* handarr[], CCard* allcard, int cnt, int maxcardcnt)
+{
+	bool SameNum = false;
+
+	for (int i = 0; i < cnt;)
+	{
+		int iCnt = rand() % maxcardcnt;
+
+		for (int j = 0; j < cnt; ++j)
+		{
+			if (arr[j] == iCnt)
+			{
+				SameNum = true;
+				break;
+			}
+		}
+
+		if (SameNum)
+		{
+			SameNum = false;
+			continue;
+		}
+
+		arr[i] = iCnt;
+		handarr[i] = (allcard + arr[i]);
+		++i;
+	}
+}
+
+void AddNewCard(CCard* handarr[], CCard* allcard, int cnt, int maxcardcnt, int curcnt)
+{
+	int iNowHand = curcnt + cnt;
+
+	if (iNowHand > HANDCARDMAX)
+		iNowHand = HANDCARDMAX;
+
+	bool SameNum = false;
+
+	for (int i = curcnt; i < iNowHand;)
+	{
+		int iCnt = rand() % maxcardcnt;
+
+		for (int j = 0; j < iNowHand; ++j)
+		{
+			if (arr[j] == iCnt)
+			{
+				SameNum = true;
+				break;
+			}
+		}
+
+		if (SameNum)
+		{
+			SameNum = false;
+			continue;
+		}
+
+		arr[i] = iCnt;
+		handarr[i] = (allcard + arr[i]);
+		++i;
+	}
+}
+
+void PlayerNewTurn(CPlayer* player)
+{
+	player->m_iForce = player->m_iOriForce;
+	player->m_iShiled = player->m_iOrishiled;
+	player->m_iMaxHP = player->m_iOriMaxHp;
+	player->m_iCost = player->m_iMaxCost;
+
+	player->m_iHandCard = HANDCOUNT;
+
+	for (int i = 0; i < HANDCARDMAX; ++i)
+	{
+		arr[i] = -1;
+		player->m_bUseCard[i] = false;
+	}
+
+	ShuffleNewCard(player->m_HandCard, player->m_pCard, HANDCOUNT, MAXCARDKINDS);
+
+	player->m_bRender = false;
+	player->m_bHandChange = true;
+	player->m_bChangeCard = true;
 }

@@ -2,11 +2,13 @@
 
 #include "stdafx.h"
 
-#define HANDCARDPOSX 15
-#define HANDCARDPOSY 7
+#define HANDCARDPOSX		15
+#define HANDCARDPOSY		5
+#define HANDCARDINTERVAL	25
 
-#define CARDINFOPOSX 7
-#define CARDINFOPOSY 34
+#define CARDINFOPOSX		7
+#define CARDINFOPOSY		34
+#define ERASEWITHCURSOR		HANDCARDPOSX - 5
 
 enum CARTTYPE { ATTACK, SHILED, BUFF, DEBUFF, SHUFFLE, PLUSCOST, CARDTYPE_END };
 
@@ -65,9 +67,15 @@ int InitPlayerCard(CCard* playercard, CCard* allcard, int cnt, int MaxCardNum)
 
 int PrintCardName(CCard* card[], int cnt, bool arr[])
 {
+	for (int i = 4; i < 29; ++i)
+	{
+		gotoxy(ERASEWITHCURSOR, i);
+		printf("                                 ");
+	}
+
 	for (int i = 0; i < cnt; ++i)
 	{
-		gotoxy(HANDCARDPOSX, HANDCARDPOSY + (4 * i));
+		gotoxy(HANDCARDPOSX, HANDCARDPOSY + ((HANDCARDINTERVAL / cnt) * i));
 		if (arr[i])
 			textcolor(RED);
 		printf("%s (%d)", card[i]->m_chCardName, card[i]->m_iCost);

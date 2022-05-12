@@ -57,7 +57,7 @@ int MenuLateUpdate(CMainMenu* mainmenu)
 
 int MenuRender(CMainMenu* mainmenu)
 {
-	if (CheckBlink(&(mainmenu->m_iCursorBlinkTime), 300))
+	if (CheckBlink(&(mainmenu->m_iCursorBlinkTime), 250))
 		printf("¢º");
 	else
 		printf("¢¹");
