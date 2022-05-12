@@ -153,6 +153,9 @@ int ReleasePlayer(CPlayer* player)
 int CheckWithCard(CPlayer* player, CCard card)
 {
 	player->m_iUseCardType = card.m_iCardType;
+
+	PrintStoryMessage(player->m_HandCard[player->m_iCursorPos]->m_chCardName, " (을)를 사용했다.");
+
 	switch (card.m_iCardType)
 	{
 	case SHILED:

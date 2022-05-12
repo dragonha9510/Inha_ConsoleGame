@@ -23,9 +23,11 @@ typedef struct Dungeon
 	int m_iCursorPos;
 	int m_iStoryCursorPos;
 	int m_iCursorBlinkTime;
+	int m_iCurStory;
 	bool m_bRender;
 	bool m_bStoryMode;
 	bool m_bStory;
+	CMonster* m_pMonster;
 	CPlayer* m_pPlayer;
 }CDungeon;
 
@@ -45,6 +47,7 @@ int InitDungeon(CDungeon* dungeon)
 		dungeon->m_iStoryCursorPos = -1;
 		dungeon->m_pPlayer->m_iCursorPos = dungeon->m_iCursorPos;
 		dungeon->m_bStoryMode = false;
+		dungeon->m_iCurStory = EMERGENCE;
 	}
 
 	return _OK;
@@ -111,7 +114,7 @@ int DungeonUpdate(CDungeon* dungeon)
 	if(!dungeon->m_bStoryMode)
 		PlayerUpdate(dungeon->m_pPlayer);
 
-	else if(dungeon->m_bStoryMode)
+	if (!dungeon->m_bStory)
 	{
 		switch (chMessage)
 		{
@@ -122,10 +125,15 @@ int DungeonUpdate(CDungeon* dungeon)
 			switch (dungeon->m_iStoryCursorPos)
 			{
 			case ENDTURN:
-				PlayerNewTurn(dungeon->m_pPlayer);
-				dungeon->m_bStory = true;
-				dungeon->m_bStoryMode = false;
-				dungeon->m_iStoryCursorPos = -1;
+				if (dungeon->m_iCurStory == EMERGENCE)
+				{
+					PlayerNewTurn(dungeon->m_pPlayer);
+					dungeon->m_bStory = true;
+					dungeon->m_bStoryMode = false;
+					dungeon->m_iStoryCursorPos = 0;
+					dungeon->m_iCursorPos = 0;
+					dungeon->m_iCurStory = EMERGENCE;
+				}
 				break;
 			case ENDGAME:
 				return MENU;
@@ -133,6 +141,19 @@ int DungeonUpdate(CDungeon* dungeon)
 			break;
 		}
 	}
+	else
+	{
+		dungeon->m_bStoryMode = StoryRender(dungeon->m_iCurStory, dungeon->m_pPlayer, dungeon->m_pMonster);
+
+		if (dungeon->m_bStoryMode == false)
+		{
+			dungeon->m_iCurStory = rand() % STORY_END;
+			dungeon->m_bStory = false;
+		}
+		else
+			dungeon->m_bStory = false;
+	}
+
 
 	return PLAY;
 }

@@ -82,13 +82,7 @@ int Progress(CMainGame* maingame)
 		}
 		break;
 	case LOAD:
-
-		break;
 	case CHALLENGE:
-
-		break;
-	case MENUEND:
-		return _EXIT;
 	case MENU:
 		if (!maingame->m_pMenu->m_bRender)
 		{
@@ -104,6 +98,8 @@ int Progress(CMainGame* maingame)
 		if (maingame->m_iCheckScene != MENU)
 			maingame->m_pMenu->m_bRender = false;
 		break;
+	case MENUEND:
+		return _EXIT;
 	case _EXIT:
 		return _EXIT;
 	default:

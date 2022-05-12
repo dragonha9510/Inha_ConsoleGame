@@ -34,6 +34,9 @@ extern HANDLE g_COUT = 0;		// console Output
 #define _OK			0
 #define _FAIL		1
 
+#define STORYPOSX	50
+#define STORYPOSY	4
+
 #define IFERROREXIT(t)		if(t == _ERROR) exit(-1);
 #define IFERRORRETURN(t)	(t == _ERROR) ? 1 : 0
 
@@ -48,13 +51,63 @@ extern HANDLE g_COUT = 0;		// console Output
 enum MENU_ENUM { PLAY = 0, LOAD, CHALLENGE, MENUEND , MENU, ENUM_END };
 
 extern char chMessage = '\0';
+extern int iStoryLine = 19;
+extern char chStoryMessage[20][MAXBUFFER] = { '\0' };
 
 #include "Console_Func.h"
+
+void PrintStoryMessage(const char* a, const char* b)
+{
+	//if (iStoryLine > 19)
+	//{
+	//	iStoryLine = 19;
+
+	//	for (int i = 0; i < iStoryLine; ++i)
+	//	{
+	//		strcpy(chStoryMessage[i], chStoryMessage[i + 1]);
+	//		gotoxy(STORYPOSX, STORYPOSY + i);
+	//		printf("                                             ");
+	//		gotoxy(STORYPOSX, STORYPOSY + i);
+	//		printf("%s", chStoryMessage[i]);
+	//	}
+	//}
+
+	//strcpy(chStoryMessage[iStoryLine], a);
+	//strcat(chStoryMessage[iStoryLine], b);
+	//gotoxy(STORYPOSX, STORYPOSY + iStoryLine);
+	//printf("                                             ");
+	//gotoxy(STORYPOSX, STORYPOSY + iStoryLine);
+	//printf("%s", chStoryMessage[iStoryLine++]);
+
+	for (int i = 0; i < 19; ++i)
+	{
+		if (!strcmp(chStoryMessage[i + 1], ""))
+			continue;
+		strcpy(chStoryMessage[i], chStoryMessage[i + 1]);
+		gotoxy(STORYPOSX, STORYPOSY + i);
+		printf("                                             ");
+		textcolor(DARKGRAY);
+		gotoxy(STORYPOSX, STORYPOSY + i);
+		printf("%s", chStoryMessage[i]);
+	}
+
+	iStoryLine = 19;
+	textcolor(WHITE);
+
+	strcpy(chStoryMessage[iStoryLine], a);
+	strcat(chStoryMessage[iStoryLine], b);
+	gotoxy(STORYPOSX, STORYPOSY + iStoryLine);
+	printf("                                             ");
+	gotoxy(STORYPOSX, STORYPOSY + iStoryLine);
+	printf("%s", chStoryMessage[iStoryLine--]);
+}
 
 #include "Card.h"
 #include "FileIO.h"
 #include "_Player.h"
+#include "Monster.h"
 #include "MainMenu.h"
+#include "Story.h"
 #include "Dungeon.h"
 #include "SaveLoad.h"
 

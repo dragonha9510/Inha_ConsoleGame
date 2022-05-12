@@ -148,6 +148,7 @@
     <ClInclude Include="FileIO.h" />
     <ClInclude Include="Maingame.h" />
     <ClInclude Include="MainMenu.h" />
+    <ClInclude Include="Monster.h" />
     <ClInclude Include="SaveLoad.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Story.h" />

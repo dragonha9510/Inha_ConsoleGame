@@ -65,5 +65,8 @@
     <ClInclude Include="Story.h">
       <Filter>소스 파일\2.Object</Filter>
     </ClInclude>
+    <ClInclude Include="Monster.h">
+      <Filter>소스 파일\2.Object</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
