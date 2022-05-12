@@ -145,6 +145,7 @@
   <ItemGroup>
     <ClInclude Include="Card.h" />
     <ClInclude Include="Dungeon.h" />
+    <ClInclude Include="Fight.h" />
     <ClInclude Include="FileIO.h" />
     <ClInclude Include="Maingame.h" />
     <ClInclude Include="MainMenu.h" />

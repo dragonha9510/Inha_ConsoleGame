@@ -58,27 +58,6 @@ extern char chStoryMessage[20][MAXBUFFER] = { '\0' };
 
 void PrintStoryMessage(const char* a, const char* b)
 {
-	//if (iStoryLine > 19)
-	//{
-	//	iStoryLine = 19;
-
-	//	for (int i = 0; i < iStoryLine; ++i)
-	//	{
-	//		strcpy(chStoryMessage[i], chStoryMessage[i + 1]);
-	//		gotoxy(STORYPOSX, STORYPOSY + i);
-	//		printf("                                             ");
-	//		gotoxy(STORYPOSX, STORYPOSY + i);
-	//		printf("%s", chStoryMessage[i]);
-	//	}
-	//}
-
-	//strcpy(chStoryMessage[iStoryLine], a);
-	//strcat(chStoryMessage[iStoryLine], b);
-	//gotoxy(STORYPOSX, STORYPOSY + iStoryLine);
-	//printf("                                             ");
-	//gotoxy(STORYPOSX, STORYPOSY + iStoryLine);
-	//printf("%s", chStoryMessage[iStoryLine++]);
-
 	for (int i = 0; i < 19; ++i)
 	{
 		if (!strcmp(chStoryMessage[i + 1], ""))
@@ -102,11 +81,20 @@ void PrintStoryMessage(const char* a, const char* b)
 	printf("%s", chStoryMessage[iStoryLine--]);
 }
 
+void ClearStoryMessage()
+{
+	for (int i = 0; i < 19; ++i)
+	{
+		gotoxy(STORYPOSX, STORYPOSY + i);
+		printf("                                             ");
+	}
+}
 #include "Card.h"
 #include "FileIO.h"
-#include "_Player.h"
 #include "Monster.h"
+#include "_Player.h"
 #include "MainMenu.h"
+#include "Fight.h"
 #include "Story.h"
 #include "Dungeon.h"
 #include "SaveLoad.h"

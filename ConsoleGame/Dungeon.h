@@ -12,6 +12,8 @@
 #define STORYCURSORY	27
 #define STORYINTERVAL	20
 
+#define MONSTERMAX		10
+
 #define ENDTURN			0
 #define CHOOSE1			1
 #define CHOOSE2			2
@@ -27,7 +29,7 @@ typedef struct Dungeon
 	bool m_bRender;
 	bool m_bStoryMode;
 	bool m_bStory;
-	CMonster* m_pMonster;
+	CMonster* m_pMonsterList[MONSTERMAX];
 	CPlayer* m_pPlayer;
 }CDungeon;
 
@@ -143,7 +145,7 @@ int DungeonUpdate(CDungeon* dungeon)
 	}
 	else
 	{
-		dungeon->m_bStoryMode = StoryRender(dungeon->m_iCurStory, dungeon->m_pPlayer, dungeon->m_pMonster);
+		dungeon->m_bStoryMode = StoryRender(dungeon->m_iCurStory, dungeon->m_pPlayer, dungeon->m_pMonsterList[0]);
 
 		if (dungeon->m_bStoryMode == false)
 		{
@@ -153,7 +155,6 @@ int DungeonUpdate(CDungeon* dungeon)
 		else
 			dungeon->m_bStory = false;
 	}
-
 
 	return PLAY;
 }
@@ -250,6 +251,10 @@ void ReleaseDungeon(CDungeon* dungeon)
 {
 	if (!NULLCHECKRETURN(dungeon->m_pPlayer))
 	{
+		for (int i = 0; i < MONSTERMAX; ++i)
+		{
+			NULLCHECKFREE(dungeon->m_pMonsterList[i]);
+		}
 		ReleasePlayer(dungeon->m_pPlayer);
 		NULLCHECKFREE(dungeon->m_pPlayer);
 	}

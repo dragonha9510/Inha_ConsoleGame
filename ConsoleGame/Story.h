@@ -60,6 +60,8 @@ bool RestStory(int ran)
 }
 bool EmerStory(int ran)
 {
+	// 몬스터가 플레이어에게
+
 	PrintStoryMessage("Test", " (을)를 출력.");
 
 	switch (ran)

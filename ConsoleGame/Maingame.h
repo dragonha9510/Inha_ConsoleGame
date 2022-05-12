@@ -79,6 +79,7 @@ int Progress(CMainGame* maingame)
 		{
 			ReleaseDungeon(maingame->m_pDungeon);
 			maingame->m_pDungeon->m_bRender = false;
+			memset(chStoryMessage, 0, sizeof(chStoryMessage));
 		}
 		break;
 	case LOAD:
