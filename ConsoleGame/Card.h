@@ -10,7 +10,7 @@
 #define CARDINFOPOSY		34
 #define ERASEWITHCURSOR		HANDCARDPOSX - 5
 
-enum CARTTYPE { ATTACK, SHILED, BUFF, DEBUFF, SHUFFLE, PLUSCOST, CARDTYPE_END };
+enum CARTTYPE { ATTACK, SHIELD, BUFF, DEBUFF, SHUFFLE, PLUSCOST, CARDTYPE_END };
 
 typedef struct Card
 {
@@ -21,15 +21,15 @@ typedef struct Card
 	//Attack
 	int m_iDmg;
 
-	//Shiled
-	int m_iShiled;
+	//Shield
+	int m_iShield;
 
 	//Buff
 	int m_iBuffHP;
 	int m_iBuffForce;
 
 	//Debuff
-	int m_iDebuffShiled;
+	int m_iDebuffShield;
 	int m_iDebuffForce;
 
 	//
@@ -96,7 +96,7 @@ int PrintCardInfo(CCard card)
 	{
 		strcat(chTempInfo, " (으)로 공격한다.");
 	}
-	else if (card.m_iCardType == SHILED)
+	else if (card.m_iCardType == SHIELD)
 	{
 		strcat(chTempInfo, " 만큼 증가한다.");
 	}

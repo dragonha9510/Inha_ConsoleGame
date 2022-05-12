@@ -22,11 +22,11 @@ typedef struct Player
 	char m_chName[MAXBUFFER];
 
 	int m_iOriForce;
-	int m_iOrishiled;
+	int m_iOriShield;
 	int m_iOriMaxHp;
 
 	int m_iForce;
-	int m_iShiled;
+	int m_iShield;
 	int m_iHP;
 	int m_iGold;
 	int m_iMaxHP;
@@ -43,6 +43,8 @@ typedef struct Player
 	CCard* m_HandCard[HANDCARDMAX];
 
 	int m_iUseCardType;
+
+	bool m_bAttack;
 
 	bool m_bChangeCard;
 	bool m_bHandChange;
@@ -68,7 +70,7 @@ int InitPlayer(CPlayer* player)
 	strcpy(player->m_chName, "TESTPLAYER");
 
 	player->m_iForce	= player->m_iOriForce	= 5;
-	player->m_iShiled	= player->m_iOrishiled	= 0;
+	player->m_iShield	= player->m_iOriShield	= 0;
 	player->m_iMaxHP	= player->m_iOriMaxHp	= 100;
 	player->m_iHP								= 100;
 	player->m_iGold								= 0;
@@ -134,7 +136,7 @@ int PlayerBaseRender(CPlayer* player)
 	gotoxy(x + Xinterval, y);
 	printf("Gold  : %d", player->m_iGold);
 	gotoxy(x, ++y);
-	printf("Shield : %d (+%d)", player->m_iOrishiled, player->m_iShiled - player->m_iOrishiled);
+	printf("Shield : %d (+%d)", player->m_iOriShield, player->m_iShield - player->m_iOriShield);
 	gotoxy(x, ++y);
 	printf("Card   : %d", player->m_iCard - player->m_iHandCard);
 	gotoxy(x + Xinterval, y);
@@ -152,15 +154,18 @@ int ReleasePlayer(CPlayer* player)
 
 int CheckWithCard(CPlayer* player, CCard card)
 {
+	char temp[10];
+	int iDmg = card.m_iDmg + player->m_iForce;
 	player->m_iUseCardType = card.m_iCardType;
-	PrintStoryMessage(player->m_HandCard[player->m_iCursorPos]->m_chCardName, " (을)를 사용했다.");
+	PrintStoryMessage(card.m_chCardName, " (을)를 사용했다.");
 
 	switch (card.m_iCardType)
 	{
 	case ATTACK:
+		player->m_bAttack = true;
 		break;
-	case SHILED:
-		player->m_iShiled += card.m_iShiled;
+	case SHIELD:
+		player->m_iShield += card.m_iShield;
 		break;
 	case BUFF:
 		break;
@@ -168,21 +173,60 @@ int CheckWithCard(CPlayer* player, CCard card)
 		if (player->m_iHandCard == HANDCARDMAX)
 		{
 			player->m_bUseCard[player->m_iCursorPos] = false;
-			player->m_iCost += (player->m_HandCard[player->m_iCursorPos])->m_iCost;
+			player->m_iCost += card.m_iCost;
 			player->m_bChangeCard = false;
 			return _TRUE;
 		}
 		AddNewCard(player->m_HandCard, player->m_pCard, card.m_iDmg, player->m_iCard, player->m_iHandCard);
 		player->m_iHandCard += card.m_iDmg;
 
+		iDmg = card.m_iDmg;
+
 		if (player->m_iHandCard > HANDCARDMAX)
+		{
+			iDmg = card.m_iDmg - HANDCARDMAX - player->m_iHandCard;
 			player->m_iHandCard = HANDCARDMAX;
+		}
+
+		sprintf(temp, "%d", iDmg);
+		PrintStoryMessage(temp, " 장 (을)를 뽑았다.");
 		break;
 	case PLUSCOST:
-		player->m_iCost += (player->m_HandCard[player->m_iCursorPos])->m_iCost * 2;
+		player->m_iCost += card.m_iCost * 2;
 		break;
 	default:
 		break;
+	}
+
+	if (card.m_iDmg != 0 && card.m_iCardType != SHUFFLE)
+	{
+		sprintf(temp, "%d", iDmg);
+		PrintStoryMessage(temp, " 만큼 공격했다.");
+	}
+	if (card.m_iShield != 0)
+	{
+		sprintf(temp, "%d", card.m_iShield);
+		PrintStoryMessage(temp, " 만큼 Shield(방어력) (을)를 얻었다.");
+	}
+	if (card.m_iDebuffForce != 0)
+	{
+		sprintf(temp, "%d", card.m_iDebuffForce);
+		PrintStoryMessage(temp, " 만큼 상대의 Str(힘) (을)를 감소시켰다.");
+	}
+	if (card.m_iDebuffShield != 0)
+	{
+		sprintf(temp, "%d", card.m_iDebuffShield);
+		PrintStoryMessage(temp, " 만큼 상대의 Shield(방어력) (을)를 감소시켰다.");
+	}
+	if (card.m_iBuffForce != 0)
+	{
+		sprintf(temp, "%d", card.m_iBuffForce);
+		PrintStoryMessage(temp, " 만큼 Str(힘) (을)를 얻었다.");
+	}
+	if (card.m_iBuffHP != 0)
+	{
+		sprintf(temp, "%d", card.m_iBuffHP);
+		PrintStoryMessage(temp, " 만큼 HP(체력) (을)를 얻었다");
 	}
 
 	player->m_bRender = false;
@@ -256,7 +300,7 @@ void AddNewCard(CCard* handarr[], CCard* allcard, int cnt, int maxcardcnt, int c
 void PlayerNewTurn(CPlayer* player)
 {
 	player->m_iForce = player->m_iOriForce;
-	player->m_iShiled = player->m_iOrishiled;
+	player->m_iShield = player->m_iOriShield;
 	player->m_iMaxHP = player->m_iOriMaxHp;
 	player->m_iCost = player->m_iMaxCost;
 

@@ -64,7 +64,7 @@ void PrintStoryMessage(const char* a, const char* b)
 			continue;
 		strcpy(chStoryMessage[i], chStoryMessage[i + 1]);
 		gotoxy(STORYPOSX, STORYPOSY + i);
-		printf("                                             ");
+		printf("                                                ");
 		textcolor(DARKGRAY);
 		gotoxy(STORYPOSX, STORYPOSY + i);
 		printf("%s", chStoryMessage[i]);
@@ -76,7 +76,7 @@ void PrintStoryMessage(const char* a, const char* b)
 	strcpy(chStoryMessage[iStoryLine], a);
 	strcat(chStoryMessage[iStoryLine], b);
 	gotoxy(STORYPOSX, STORYPOSY + iStoryLine);
-	printf("                                             ");
+	printf("                                                ");
 	gotoxy(STORYPOSX, STORYPOSY + iStoryLine);
 	printf("%s", chStoryMessage[iStoryLine--]);
 }
@@ -86,7 +86,7 @@ void ClearStoryMessage()
 	for (int i = 0; i < 19; ++i)
 	{
 		gotoxy(STORYPOSX, STORYPOSY + i);
-		printf("                                             ");
+		printf("                                                ");
 	}
 }
 #include "Card.h"

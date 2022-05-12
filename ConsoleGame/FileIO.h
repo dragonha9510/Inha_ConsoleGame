@@ -74,7 +74,7 @@ int GetCardInfo(const char* filename, CCard* card)
 		(card + i)->m_iDmg = atoi(ptr);
 
 		ptr = strtok(NULL, "/");
-		(card + i)->m_iShiled = atoi(ptr);
+		(card + i)->m_iShield = atoi(ptr);
 
 		ptr = strtok(NULL, "/");
 		(card + i)->m_iBuffHP = atoi(ptr);
@@ -83,7 +83,7 @@ int GetCardInfo(const char* filename, CCard* card)
 		(card + i)->m_iBuffForce = atoi(ptr);
 
 		ptr = strtok(NULL, "/");
-		(card + i)->m_iDebuffShiled = atoi(ptr);
+		(card + i)->m_iDebuffShield = atoi(ptr);
 
 		ptr = strtok(NULL, "/");
 		(card + i)->m_iDebuffForce = atoi(ptr);
