@@ -27,6 +27,7 @@ typedef struct Dungeon
 	int m_iCursorBlinkTime;
 	int m_iCurStory;
 
+
 	bool m_bRender;
 	bool m_bStoryMode;
 	bool m_bActiveStory;
@@ -34,9 +35,62 @@ typedef struct Dungeon
 	bool m_bEndTurn;
 	bool m_bMonsterDie;
 
+	CStory m_cStoryCnt;
 	CPlayer* m_pPlayer;
 	CMonster* m_pMonsterList[MONSTERMAX];
 }CDungeon;
+
+int StoryLogic(CDungeon* dungeon)
+{
+	while(true)
+	{
+		int RanStory = rand() % NORMAL;
+	
+		switch (RanStory)
+		{
+		case FIGHT:
+		case FIGHTEND:
+			if (dungeon->m_cStoryCnt.m_iEmerCnt < 3)
+			{
+				++dungeon->m_cStoryCnt.m_iEmerCnt;
+				dungeon->m_cStoryCnt.m_iRestCnt = 0;
+				dungeon->m_cStoryCnt.m_iShopCnt = 0;
+				dungeon->m_cStoryCnt.m_iNormalCnt = 0;
+				return RanStory;
+			}
+			break;
+		case SHOP:
+		case SHOPEND:
+			if (!dungeon->m_cStoryCnt.m_iShopCnt)
+			{
+				++dungeon->m_cStoryCnt.m_iShopCnt;
+				dungeon->m_cStoryCnt.m_iEmerCnt = 0;
+				dungeon->m_cStoryCnt.m_iNormalCnt = 0;
+				return RanStory;
+			}
+			break;
+		case REST:
+		case RESTEND:
+			if (!dungeon->m_cStoryCnt.m_iRestCnt)
+			{
+				++dungeon->m_cStoryCnt.m_iRestCnt;
+				dungeon->m_cStoryCnt.m_iEmerCnt = 0;
+				dungeon->m_cStoryCnt.m_iNormalCnt = 0;
+				return RanStory;
+			}
+			break;
+		case NORMAL:
+		case NORMALEND:
+			if (!dungeon->m_cStoryCnt.m_iNormalCnt)
+			{
+				++dungeon->m_cStoryCnt.m_iNormalCnt;
+				dungeon->m_cStoryCnt.m_iEmerCnt = 0;
+				return RanStory;
+			}
+			break;
+		}
+	}
+}
 
 int InitDungeon(CDungeon* dungeon)
 {
@@ -133,7 +187,6 @@ int DungeonUpdate(CDungeon* dungeon)
 			PlayerUpdate(dungeon->m_pPlayer);
 		}
 
-
 		if (!dungeon->m_bStory)
 		{
 			switch (chMessage)
@@ -167,12 +220,19 @@ int DungeonUpdate(CDungeon* dungeon)
 		dungeon->m_bActiveStory = iCheckStoryEnd;
 		dungeon->m_bStoryMode = true;
 		dungeon->m_bStory = false;
-
-		// 몬스터 공격 주고 받기
-
-		// 몬스터가 죽으면
-		dungeon->m_bMonsterDie = true;
 	}
+
+	// 몬스터 공격 주고 받기
+	if (dungeon->m_pPlayer->m_bAttack)
+	{
+		SetFightInfoToPlayer(dungeon->m_pPlayer, GetMonsterFightInfo(dungeon->m_pMonsterList[0]));
+		SetFightInfoToMonster(dungeon->m_pMonsterList[0], dungeon->m_pPlayer->m_FightInfo);
+		dungeon->m_pPlayer->m_bAttack = false;
+	}
+
+	// 몬스터가 죽으면
+	if (MonsterDeadReturn(dungeon->m_pMonsterList[0]))
+		dungeon->m_bMonsterDie = true;
 
 	return PLAY;
 }
@@ -186,6 +246,8 @@ int DungeonLateUpdate(CDungeon* dungeon)
 		dungeon->m_bStoryMode = false;
 		dungeon->m_iStoryCursorPos = 0;
 		dungeon->m_iCursorPos = 0;
+
+		// 플레이어 죽었으면 겜끝
 		if (PlayerDeadReturn(dungeon->m_pPlayer))
 			dungeon->m_iCurStory = STORYEND;
 		else
@@ -193,9 +255,10 @@ int DungeonLateUpdate(CDungeon* dungeon)
 
 		dungeon->m_bEndTurn = false;
 
+		// 몬스터 죽었으면 새로운 스토리라인 출력
 		if (dungeon->m_bMonsterDie)
 		{
-			dungeon->m_iCurStory = NORMAL;
+			dungeon->m_iCurStory = StoryLogic(dungeon);
 			dungeon->m_bMonsterDie = false;
 		}
 	}

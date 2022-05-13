@@ -204,37 +204,48 @@ int CheckWithCard(CPlayer* player, CCard card)
 	default:
 		break;
 	}
-
+	int iCheckAtt = 0;
 	if (card.m_iDmg != 0 && card.m_iCardType != SHUFFLE)
 	{
+		++iCheckAtt;
 		sprintf(temp, "%d", iDmg);
 		PrintStoryMessage(temp, " 만큼 공격했다.");
 	}
 	if (card.m_iShield != 0)
 	{
+		++iCheckAtt;
 		sprintf(temp, "%d", card.m_iShield);
 		PrintStoryMessage(temp, " 만큼 Shield(방어력) (을)를 얻었다.");
 	}
 	if (card.m_iDebuffForce != 0)
 	{
+		++iCheckAtt;
 		sprintf(temp, "%d", card.m_iDebuffForce);
 		PrintStoryMessage(temp, " 만큼 상대의 Str(힘) (을)를 감소시켰다.");
 	}
 	if (card.m_iDebuffShield != 0)
 	{
+		++iCheckAtt;
 		sprintf(temp, "%d", card.m_iDebuffShield);
 		PrintStoryMessage(temp, " 만큼 상대의 Shield(방어력) (을)를 감소시켰다.");
 	}
 	if (card.m_iBuffForce != 0)
 	{
+		++iCheckAtt;
 		sprintf(temp, "%d", card.m_iBuffForce);
 		PrintStoryMessage(temp, " 만큼 Str(힘) (을)를 얻었다.");
 	}
 	if (card.m_iBuffHP != 0)
 	{
+		++iCheckAtt;
 		sprintf(temp, "%d", card.m_iBuffHP);
 		PrintStoryMessage(temp, " 만큼 HP(체력) (을)를 얻었다");
 	}
+
+	if (iCheckAtt)
+		player->m_bAttack = true;
+	else
+		player->m_bAttack = false;
 
 	if(card.m_iCardType != PLUSCOST && card.m_iCardType != SHUFFLE)
 		SetPlayerFightInfo(player);

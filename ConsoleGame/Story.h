@@ -9,6 +9,7 @@ typedef struct story
 	int m_iShopCnt;
 	int m_iRestCnt;
 	int m_iEmerCnt;
+	int m_iNormalCnt;
 }CStory;
 
 CStory str = { 0,0,0 };
@@ -27,21 +28,14 @@ int StoryRender(int storytype, bool* end)
 	{
 	case FIGHT:
 	case FIGHTEND:
-		str.m_iShopCnt = 0;
-		str.m_iRestCnt = 0;
-		++(str.m_iEmerCnt);
 		bReturn = FightStory(0);
 		break;
 	case SHOP:
 	case SHOPEND:
-		++(str.m_iShopCnt);
-		str.m_iEmerCnt = 0;
 		bReturn = ShopStory(0);
 		break;
 	case REST:
 	case RESTEND:
-		++(str.m_iRestCnt);
-		str.m_iEmerCnt = 0;
 		bReturn = RestStory(0);
 		break;
 	case NORMAL:

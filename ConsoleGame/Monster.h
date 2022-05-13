@@ -13,7 +13,7 @@ typedef struct monster
 }CMonster;
 
 int			SetFightInfoToMonster(CMonster* monster, FIGHTACT fight);
-FIGHTACT	SetMonsterFightInfo(CMonster* monster);
+FIGHTACT	GetMonsterFightInfo(CMonster* monster);
 CMonster*	MakeMonster(int hp, int shield, int dmg, int gold);
 
 
@@ -36,7 +36,15 @@ int SetFightInfoToMonster(CMonster* monster, FIGHTACT fight)
 	return _TRUE;
 }
 
-FIGHTACT	SetMonsterFightInfo(CMonster* monster)
+bool MonsterDeadReturn(CMonster* monster)
+{
+	if (monster->m_iHP <= 0)
+		return true;
+
+	return false;
+}
+
+FIGHTACT GetMonsterFightInfo(CMonster* monster)
 {
 	FIGHTACT* fightinfo = &(monster->m_FightInfo);
 
@@ -54,6 +62,12 @@ CMonster* MakeMonster(int hp, int shield, int dmg, int gold)
 	pMonster->m_iShield = shield;
 	pMonster->m_iDmg = dmg;
 	pMonster->m_iGold = gold;
+	
+	// FIGHT INFO 입력 필요
+	pMonster->m_FightInfo.Type = 0;
+	pMonster->m_FightInfo.GiveDebuffForce = 0;
+	pMonster->m_FightInfo.GiveDebuffShield = 0;
+	pMonster->m_FightInfo.GiveDmg = pMonster->m_iDmg;
 
 	return pMonster;
 }
