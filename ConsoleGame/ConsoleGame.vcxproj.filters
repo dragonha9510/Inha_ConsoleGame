@@ -28,9 +28,6 @@
     <Filter Include="소스 파일\3.Tool">
       <UniqueIdentifier>{1ed23993-162e-457b-a943-039744ed0c60}</UniqueIdentifier>
     </Filter>
-    <Filter Include="소스 파일\2.Object\0.Act">
-      <UniqueIdentifier>{fe87f5d5-d9e5-4c7e-a291-3cbd0fd3df0a}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.c">
@@ -70,9 +67,6 @@
     </ClInclude>
     <ClInclude Include="Monster.h">
       <Filter>소스 파일\2.Object</Filter>
-    </ClInclude>
-    <ClInclude Include="Fight.h">
-      <Filter>소스 파일\2.Object\0.Act</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

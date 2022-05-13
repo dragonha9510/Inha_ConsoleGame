@@ -21,6 +21,13 @@ typedef struct Player
 {
 	char m_chName[MAXBUFFER];
 
+	bool m_bAttack;
+
+	bool m_bChangeCard;
+	bool m_bHandChange;
+	bool m_bUseCard[HANDCARDMAX];
+	bool m_bRender;
+
 	int m_iOriForce;
 	int m_iOriShield;
 	int m_iOriMaxHp;
@@ -37,25 +44,22 @@ typedef struct Player
 	int m_iHandCard;
 
 	int m_iCursorPos;
+	int m_iUseCardType;
 
 	CCard* m_pCard;
 	CCard* m_pAllCard;
 	CCard* m_HandCard[HANDCARDMAX];
 
-	int m_iUseCardType;
-
-	bool m_bAttack;
-
-	bool m_bChangeCard;
-	bool m_bHandChange;
-	bool m_bUseCard[HANDCARDMAX];
-	bool m_bRender;
+	FIGHTACT m_FightInfo;
 }CPlayer;
 
-void ShuffleNewCard(CCard* handarr[], CCard* allcard, int cnt, int maxcardcnt);
-void AddNewCard(CCard* handarr[], CCard* allcard, int cnt, int maxcardcnt, int curcnt);
-int CheckWithCard(CPlayer* player, CCard card);
-void PlayerNewTurn(CPlayer* player);
+void		ShuffleNewCard(CCard* handarr[], CCard* allcard, int cnt, int maxcardcnt);
+void		AddNewCard(CCard* handarr[], CCard* allcard, int cnt, int maxcardcnt, int curcnt);
+void		PlayerNewTurn(CPlayer* player);
+void		ClearPlayerFightInfo(CPlayer* player);
+int			CheckWithCard(CPlayer* player, CCard card);
+int			SetFightInfoToPlayer(CPlayer* player, FIGHTACT fight);
+FIGHTACT	SetPlayerFightInfo(CPlayer* player);
 
 int InitPlayer(CPlayer* player)
 {
@@ -154,6 +158,8 @@ int ReleasePlayer(CPlayer* player)
 
 int CheckWithCard(CPlayer* player, CCard card)
 {
+	ClearPlayerFightInfo(player);
+
 	char temp[10];
 	int iDmg = card.m_iDmg + player->m_iForce;
 	player->m_iUseCardType = card.m_iCardType;
@@ -162,7 +168,6 @@ int CheckWithCard(CPlayer* player, CCard card)
 	switch (card.m_iCardType)
 	{
 	case ATTACK:
-		player->m_bAttack = true;
 		break;
 	case SHIELD:
 		player->m_iShield += card.m_iShield;
@@ -193,6 +198,8 @@ int CheckWithCard(CPlayer* player, CCard card)
 		break;
 	case PLUSCOST:
 		player->m_iCost += card.m_iCost * 2;
+		sprintf(temp, "%d", card.m_iCost);
+		PrintStoryMessage(temp, " 만큼 Cost (을)를 획득했다.");
 		break;
 	default:
 		break;
@@ -229,6 +236,8 @@ int CheckWithCard(CPlayer* player, CCard card)
 		PrintStoryMessage(temp, " 만큼 HP(체력) (을)를 얻었다");
 	}
 
+	if(card.m_iCardType != PLUSCOST && card.m_iCardType != SHUFFLE)
+		SetPlayerFightInfo(player);
 	player->m_bRender = false;
 
 	return _TRUE;
@@ -297,6 +306,14 @@ void AddNewCard(CCard* handarr[], CCard* allcard, int cnt, int maxcardcnt, int c
 	}
 }
 
+int PlayerDeadReturn(CPlayer* player)
+{
+	if (player->m_iHP <= 0)
+		return 1;
+
+	return 0;
+}
+
 void PlayerNewTurn(CPlayer* player)
 {
 	player->m_iForce = player->m_iOriForce;
@@ -317,4 +334,40 @@ void PlayerNewTurn(CPlayer* player)
 	player->m_bRender = false;
 	player->m_bHandChange = true;
 	player->m_bChangeCard = true;
+}
+
+int SetFightInfoToPlayer(CPlayer* player, FIGHTACT fight)
+{
+	player->m_iShield = player->m_iShield < 0 ? 0 : player->m_iShield - fight.GiveDebuffShield;
+		
+
+	if (player->m_iShield < fight.GiveDmg)
+	{
+		player->m_iHP -= fight.GiveDmg - player->m_iShield;
+		player->m_iShield = 0;
+	}
+	else
+		player->m_iShield -= fight.GiveDmg;
+
+	player->m_iForce -= fight.GiveDebuffForce;
+
+	return _TRUE;
+}
+
+FIGHTACT SetPlayerFightInfo(CPlayer* player)
+{
+	FIGHTACT* fightinfo = &(player->m_FightInfo);
+	CCard* playerCard = (player->m_HandCard[player->m_iCursorPos]);
+
+	fightinfo->Type = playerCard->m_iCardType;
+	fightinfo->GiveDmg = player->m_iForce + playerCard->m_iDmg;
+	fightinfo->GiveDebuffForce = playerCard->m_iDebuffForce;
+	fightinfo->GiveDebuffShield = playerCard->m_iDebuffShield;
+
+	return *fightinfo;
+}
+
+void ClearPlayerFightInfo(CPlayer* player)
+{
+	memset(&(player->m_FightInfo), 0, sizeof(FIGHTACT));
 }

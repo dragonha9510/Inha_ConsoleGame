@@ -8,9 +8,10 @@
 
 typedef struct MAINMENU
 {
+	bool m_bRender;
+
 	int m_iCursorPos;
 	int m_iCursorBlinkTime;
-	bool m_bRender;
 }CMainMenu;
 
 int MenuUpdate(CMainMenu* mainmenu)

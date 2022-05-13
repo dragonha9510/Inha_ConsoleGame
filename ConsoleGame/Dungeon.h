@@ -26,11 +26,16 @@ typedef struct Dungeon
 	int m_iStoryCursorPos;
 	int m_iCursorBlinkTime;
 	int m_iCurStory;
+
 	bool m_bRender;
 	bool m_bStoryMode;
+	bool m_bActiveStory;
 	bool m_bStory;
-	CMonster* m_pMonsterList[MONSTERMAX];
+	bool m_bEndTurn;
+	bool m_bMonsterDie;
+
 	CPlayer* m_pPlayer;
+	CMonster* m_pMonsterList[MONSTERMAX];
 }CDungeon;
 
 int InitDungeon(CDungeon* dungeon)
@@ -49,7 +54,15 @@ int InitDungeon(CDungeon* dungeon)
 		dungeon->m_iStoryCursorPos = -1;
 		dungeon->m_pPlayer->m_iCursorPos = dungeon->m_iCursorPos;
 		dungeon->m_bStoryMode = false;
-		dungeon->m_iCurStory = EMERGENCE;
+		dungeon->m_iCurStory = NORMAL;
+
+		dungeon->m_bActiveStory = true;
+	}
+
+	for (int i = 0; i < MONSTERMAX; ++i)
+	{
+		if(NULLCHECKRETURN(dungeon->m_pMonsterList[i]))
+			dungeon->m_pMonsterList[i] = MakeMonster(10 * (i + 1), 5 * (i + 1), 5 * (i + 1), 5 * (i + 1));
 	}
 
 	return _OK;
@@ -57,103 +70,108 @@ int InitDungeon(CDungeon* dungeon)
 
 int DungeonUpdate(CDungeon* dungeon)
 {
-	if (chMessage == ARROWKEY)
+	if (!dungeon->m_bActiveStory)
 	{
-		chMessage = _getch();
-
-		gotoxy(CARDCURSORX, CARDCURSORY + (dungeon->m_iCursorPos * (CARDINTERVAL / dungeon->m_pPlayer->m_iHandCard)));
-		printf("  ");
-
-		gotoxy(STORYCURSORX + STORYINTERVAL * dungeon->m_iStoryCursorPos, STORYCURSORY);
-		printf("  ");
-
-		switch (chMessage)
+		if (chMessage == ARROWKEY)
 		{
-		case UP:
-			if (!dungeon->m_bStoryMode)
-				--(dungeon->m_iCursorPos);
-			break;
-		case DOWN:
-			if (!dungeon->m_bStoryMode)
-				++(dungeon->m_iCursorPos);
-			break;
-		case LEFT:
-			if (dungeon->m_bStoryMode)
-			{
-				if (--dungeon->m_iStoryCursorPos < 0)
-				{
-					dungeon->m_iStoryCursorPos = -1;
-					dungeon->m_bStoryMode = false;
-				}
-			}
-			break;
-		case RIGHT:
-			if (++dungeon->m_iStoryCursorPos >= 0)
-			{
-				dungeon->m_bStoryMode = true;
-			}
-			if (dungeon->m_iStoryCursorPos > ENDGAME)
-				dungeon->m_iStoryCursorPos = ENDGAME;
-			break;
-		default:
-			return _ERROR;
-		}
+			chMessage = _getch();
 
-		if (chMessage == LEFT || chMessage == RIGHT)
-		{
-			if(dungeon->m_iCursorPos > dungeon->m_pPlayer->m_iHandCard - 1)
-				dungeon->m_bStoryMode = true;
-		}
-		else
-		{
-			if (dungeon->m_iCursorPos < CARDMINNUM)
-				dungeon->m_iCursorPos = dungeon->m_pPlayer->m_iHandCard - 1;
-			else if (dungeon->m_iCursorPos > dungeon->m_pPlayer->m_iHandCard - 1)
-				dungeon->m_iCursorPos = CARDMINNUM;
-		}
-	}
+			gotoxy(CARDCURSORX, CARDCURSORY + (dungeon->m_iCursorPos * (CARDINTERVAL / dungeon->m_pPlayer->m_iHandCard)));
+			printf("  ");
 
-	if(!dungeon->m_bStoryMode)
-		PlayerUpdate(dungeon->m_pPlayer);
-
-	if (!dungeon->m_bStory)
-	{
-		switch (chMessage)
-		{
-		case SPACE:
 			gotoxy(STORYCURSORX + STORYINTERVAL * dungeon->m_iStoryCursorPos, STORYCURSORY);
 			printf("  ");
 
-			switch (dungeon->m_iStoryCursorPos)
+			switch (chMessage)
 			{
-			case ENDTURN:
-				if (dungeon->m_iCurStory == EMERGENCE)
+			case UP:
+				if (!dungeon->m_bStoryMode)
+					--(dungeon->m_iCursorPos);
+				break;
+			case DOWN:
+				if (!dungeon->m_bStoryMode)
+					++(dungeon->m_iCursorPos);
+				break;
+			case LEFT:
+				if (dungeon->m_bStoryMode)
 				{
-					PlayerNewTurn(dungeon->m_pPlayer);
-					dungeon->m_bStory = true;
-					dungeon->m_bStoryMode = false;
-					dungeon->m_iStoryCursorPos = 0;
-					dungeon->m_iCursorPos = 0;
-					dungeon->m_iCurStory = EMERGENCE;
+					if (--dungeon->m_iStoryCursorPos < 0)
+					{
+						dungeon->m_iStoryCursorPos = -1;
+						dungeon->m_bStoryMode = false;
+					}
 				}
 				break;
-			case ENDGAME:
-				return MENU;
+			case RIGHT:
+				if (++dungeon->m_iStoryCursorPos >= 0)
+				{
+					dungeon->m_bStoryMode = true;
+				}
+				if (dungeon->m_iStoryCursorPos > ENDGAME)
+					dungeon->m_iStoryCursorPos = ENDGAME;
+				break;
+			default:
+				return _ERROR;
 			}
-			break;
+
+			if (chMessage == LEFT || chMessage == RIGHT)
+			{
+				if (dungeon->m_iCursorPos > dungeon->m_pPlayer->m_iHandCard - 1)
+					dungeon->m_bStoryMode = true;
+			}
+			else
+			{
+				if (dungeon->m_iCursorPos < CARDMINNUM)
+					dungeon->m_iCursorPos = dungeon->m_pPlayer->m_iHandCard - 1;
+				else if (dungeon->m_iCursorPos > dungeon->m_pPlayer->m_iHandCard - 1)
+					dungeon->m_iCursorPos = CARDMINNUM;
+			}
 		}
+
+		if (!dungeon->m_bStoryMode)
+		{
+			PlayerUpdate(dungeon->m_pPlayer);
+		}
+
+
+		if (!dungeon->m_bStory)
+		{
+			switch (chMessage)
+			{
+			case SPACE:
+				gotoxy(STORYCURSORX + STORYINTERVAL * dungeon->m_iStoryCursorPos, STORYCURSORY);
+				printf("  ");
+
+				switch (dungeon->m_iStoryCursorPos)
+				{
+				case ENDTURN:
+					dungeon->m_bEndTurn = true;
+					dungeon->m_bActiveStory = true;
+					break;
+				case ENDGAME:
+					return MENU;
+				}
+				break;
+			}
+		}
+
 	}
 	else
 	{
-		dungeon->m_bStoryMode = StoryRender(dungeon->m_iCurStory, dungeon->m_pPlayer, dungeon->m_pMonsterList[0]);
+		// 스토리진행
+		int iCheckStoryEnd = StoryRender(dungeon->m_iCurStory, 0);
+		
+		if (iCheckStoryEnd == _ENDGAME)
+			return MENU;
 
-		if (dungeon->m_bStoryMode == false)
-		{
-			dungeon->m_iCurStory = rand() % STORY_END;
-			dungeon->m_bStory = false;
-		}
-		else
-			dungeon->m_bStory = false;
+		dungeon->m_bActiveStory = iCheckStoryEnd;
+		dungeon->m_bStoryMode = true;
+		dungeon->m_bStory = false;
+
+		// 몬스터 공격 주고 받기
+
+		// 몬스터가 죽으면
+		dungeon->m_bMonsterDie = true;
 	}
 
 	return PLAY;
@@ -161,6 +179,27 @@ int DungeonUpdate(CDungeon* dungeon)
 
 int DungeonLateUpdate(CDungeon* dungeon)
 {
+	if (dungeon->m_bEndTurn)
+	{
+		PlayerNewTurn(dungeon->m_pPlayer);
+		dungeon->m_bStory = true;
+		dungeon->m_bStoryMode = false;
+		dungeon->m_iStoryCursorPos = 0;
+		dungeon->m_iCursorPos = 0;
+		if (PlayerDeadReturn(dungeon->m_pPlayer))
+			dungeon->m_iCurStory = STORYEND;
+		else
+			dungeon->m_iCurStory = FIGHT;
+
+		dungeon->m_bEndTurn = false;
+
+		if (dungeon->m_bMonsterDie)
+		{
+			dungeon->m_iCurStory = NORMAL;
+			dungeon->m_bMonsterDie = false;
+		}
+	}
+
 	if (dungeon->m_pPlayer->m_iCursorPos != dungeon->m_iCursorPos 
 		&& (dungeon->m_iCursorPos < dungeon->m_pPlayer->m_iHandCard))
 	{

@@ -33,6 +33,7 @@ extern HANDLE g_COUT = 0;		// console Output
 #define _TRUE		1
 #define _OK			0
 #define _FAIL		1
+#define _ENDGAME	3
 
 #define STORYPOSX	50
 #define STORYPOSY	4
@@ -47,6 +48,10 @@ extern HANDLE g_COUT = 0;		// console Output
 
 #define MAXBUFFER	255
 #define DOUBLE(t)	t * 2
+
+#define MAXSTAGESTORY 11
+
+extern int iStoryCnt = 0;
 
 enum MENU_ENUM { PLAY = 0, LOAD, CHALLENGE, MENUEND , MENU, ENUM_END };
 
@@ -64,7 +69,7 @@ void PrintStoryMessage(const char* a, const char* b)
 			continue;
 		strcpy(chStoryMessage[i], chStoryMessage[i + 1]);
 		gotoxy(STORYPOSX, STORYPOSY + i);
-		printf("                                                ");
+		printf("                                                                   ");
 		textcolor(DARKGRAY);
 		gotoxy(STORYPOSX, STORYPOSY + i);
 		printf("%s", chStoryMessage[i]);
@@ -76,7 +81,7 @@ void PrintStoryMessage(const char* a, const char* b)
 	strcpy(chStoryMessage[iStoryLine], a);
 	strcat(chStoryMessage[iStoryLine], b);
 	gotoxy(STORYPOSX, STORYPOSY + iStoryLine);
-	printf("                                                ");
+	printf("                                                                   ");
 	gotoxy(STORYPOSX, STORYPOSY + iStoryLine);
 	printf("%s", chStoryMessage[iStoryLine--]);
 }
@@ -86,15 +91,24 @@ void ClearStoryMessage()
 	for (int i = 0; i < 19; ++i)
 	{
 		gotoxy(STORYPOSX, STORYPOSY + i);
-		printf("                                                ");
+		printf("                                                                   ");
 	}
 }
+
+typedef struct FightAct
+{
+	int Type;
+	int GiveDmg;
+	int GiveDebuffShield;
+	int GiveDebuffForce;
+}FIGHTACT;
+
+
 #include "Card.h"
 #include "FileIO.h"
 #include "Monster.h"
 #include "_Player.h"
 #include "MainMenu.h"
-#include "Fight.h"
 #include "Story.h"
 #include "Dungeon.h"
 #include "SaveLoad.h"

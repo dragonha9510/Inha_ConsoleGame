@@ -60,13 +60,13 @@ int GetCardInfo(const char* filename, CCard* card)
 	while (true)
 	{
 		fgets(charr, sizeof(charr), fp);
-
+		 
 		char* ptr = strtok(charr, "/");
 		strcpy((card + i)->m_chCardName, ptr);
-
+		
 		ptr = strtok(NULL, "/");
 		(card + i)->m_iCardType = atoi(ptr);
-
+		
 		ptr = strtok(NULL, "/");
 		(card + i)->m_iCost = atoi(ptr);
 
@@ -89,7 +89,7 @@ int GetCardInfo(const char* filename, CCard* card)
 		(card + i)->m_iDebuffForce = atoi(ptr);
 
 		ptr = strtok(NULL, "/");
-		(card + i)->m_iPercent = atoi(ptr);
+		(card + i)->m_iPercent = atoi(ptr); 
 
 		ptr = strtok(NULL, "/");
 		strcpy((card + i)->m_chCardInfo, ptr);
@@ -103,4 +103,51 @@ int GetCardInfo(const char* filename, CCard* card)
 	fclose(fp);
 
 	return _TRUE;
+}
+
+int GetStoryLine(int line, char* dest,const char* filename)
+{
+	char charr[MAXBUFFER];
+	char chFiletag[MAXBUFFER];
+
+	FILE* fp;
+
+	strcpy(chFiletag, "..\\Data\\");
+	strcat(chFiletag, filename);
+
+	fp = (FILE*)fopen(chFiletag, "rb");
+
+	if (NULLCHECKRETURN(fp))
+	{
+		printf("fopen error.\n");
+		return _ERROR;
+	}
+
+	int i = 0;
+
+
+	while (true)
+	{
+		if (i == 0 + (line * 3))
+		{
+			for (int j = 0; j < 3; ++j)
+			{
+				fgets(charr, sizeof(charr), fp);
+				strcpy(dest, charr);
+				PrintStoryMessage(dest, "");
+				Sleep(1000);
+			}
+		}
+		fgets(charr, sizeof(charr), fp);
+
+		if (feof(fp))
+			break;
+
+		++i;
+	}
+
+	fclose(fp);
+
+	return _TRUE;
+
 }
