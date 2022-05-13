@@ -233,6 +233,7 @@ int DungeonUpdate(CDungeon* dungeon)
 	// 몬스터가 죽으면
 	if (MonsterDeadReturn(dungeon->m_pMonsterList[0]))
 		dungeon->m_bMonsterDie = true;
+	dungeon->m_bMonsterDie = true;
 
 	return PLAY;
 }
@@ -258,7 +259,8 @@ int DungeonLateUpdate(CDungeon* dungeon)
 		// 몬스터 죽었으면 새로운 스토리라인 출력
 		if (dungeon->m_bMonsterDie)
 		{
-			dungeon->m_iCurStory = StoryLogic(dungeon);
+			//dungeon->m_iCurStory = StoryLogic(dungeon);
+			dungeon->m_iCurStory = NORMAL;
 			dungeon->m_bMonsterDie = false;
 		}
 	}

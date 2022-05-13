@@ -134,6 +134,7 @@ int GetStoryLine(int line, char* dest,const char* filename)
 			{
 				fgets(charr, sizeof(charr), fp);
 				strcpy(dest, charr);
+
 				PrintStoryMessage(dest, "");
 				Sleep(1000);
 			}
