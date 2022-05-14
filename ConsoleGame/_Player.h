@@ -173,6 +173,8 @@ int CheckWithCard(CPlayer* player, CCard card)
 		player->m_iShield += card.m_iShield;
 		break;
 	case BUFF:
+		player->m_iForce += card.m_iBuffForce;
+		player->m_iHP += card.m_iBuffHP;
 		break;
 	case SHUFFLE:
 		if (player->m_iHandCard == HANDCARDMAX)
@@ -320,7 +322,7 @@ void AddNewCard(CCard* handarr[], CCard* allcard, int cnt, int maxcardcnt, int c
 int PlayerDeadReturn(CPlayer* player)
 {
 	if (player->m_iHP <= 0)
-		return 1;
+		return 0;
 
 	return 0;
 }
@@ -349,8 +351,25 @@ void PlayerNewTurn(CPlayer* player)
 
 int SetFightInfoToPlayer(CPlayer* player, FIGHTACT fight)
 {
+	char temp[10];
+
 	player->m_iShield = player->m_iShield < 0 ? 0 : player->m_iShield - fight.GiveDebuffShield;
-		
+	
+	player->m_iForce -= fight.GiveDebuffForce;
+
+	if (fight.GiveDebuffForce)
+	{
+		sprintf(temp, "%d", fight.GiveDebuffForce);
+		PrintStoryMessage(temp, " 만큼 공격력이 감소했다.");
+		Sleep(1000);
+	}
+
+	if (fight.GiveDebuffShield)
+	{
+		sprintf(temp, "%d", fight.GiveDebuffShield);
+		PrintStoryMessage(temp, " 만큼 방어력이 감소했다.");
+		Sleep(1000);
+	}
 
 	if (player->m_iShield < fight.GiveDmg)
 	{
@@ -360,7 +379,12 @@ int SetFightInfoToPlayer(CPlayer* player, FIGHTACT fight)
 	else
 		player->m_iShield -= fight.GiveDmg;
 
-	player->m_iForce -= fight.GiveDebuffForce;
+	if (fight.GiveDmg)
+	{
+		sprintf(temp, "%d", fight.GiveDmg);
+		PrintStoryMessage(temp, " 만큼 데미지를 받았다.");
+		Sleep(1000);
+	}
 
 	return _TRUE;
 }
@@ -371,9 +395,10 @@ FIGHTACT SetPlayerFightInfo(CPlayer* player)
 	CCard* playerCard = (player->m_HandCard[player->m_iCursorPos]);
 
 	fightinfo->Type = playerCard->m_iCardType;
-	fightinfo->GiveDmg = player->m_iForce + playerCard->m_iDmg;
-	fightinfo->GiveDebuffForce = playerCard->m_iDebuffForce;
-	fightinfo->GiveDebuffShield = playerCard->m_iDebuffShield;
+
+	fightinfo->GiveDmg = (playerCard->m_iDmg > 0) ? (player->m_iForce + playerCard->m_iDmg) : 0;
+	fightinfo->GiveDebuffForce = (playerCard->m_iDebuffForce > 0) ? playerCard->m_iDebuffForce : 0;
+	fightinfo->GiveDebuffShield = (playerCard->m_iDebuffShield > 0) ? playerCard->m_iDebuffShield : 0;
 
 	return *fightinfo;
 }
