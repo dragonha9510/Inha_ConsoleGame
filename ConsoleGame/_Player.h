@@ -57,6 +57,8 @@ void		ShuffleNewCard(CCard* handarr[], CCard* allcard, int cnt, int maxcardcnt);
 void		AddNewCard(CCard* handarr[], CCard* allcard, int cnt, int maxcardcnt, int curcnt);
 void		PlayerNewTurn(CPlayer* player);
 void		ClearPlayerFightInfo(CPlayer* player);
+void		ResetPlayerFightInfo(CPlayer* player);
+void		PlayerRestHP(CPlayer* player);
 int			CheckWithCard(CPlayer* player, CCard card);
 int			SetFightInfoToPlayer(CPlayer* player, FIGHTACT fight);
 FIGHTACT	SetPlayerFightInfo(CPlayer* player);
@@ -132,17 +134,31 @@ int PlayerBaseRender(CPlayer* player)
 	int Xinterval = PLAYERINFOINTERVAL;
 
 	gotoxy(x + Xinterval, y);
+	printf("                     ");
+	gotoxy(x + Xinterval, y);
 	printf("HP / Max : %d / %d", player->m_iHP, player->m_iMaxHP);
+	gotoxy(x, y);
+	printf("               ");
 	gotoxy(x, y++);
 	printf("%s", player->m_chName);
 	gotoxy(x, ++y);
+	printf("                  ");
+	gotoxy(x, y);
 	printf("Str    : %d (+%d)", player->m_iOriForce, player->m_iForce - player->m_iOriForce);
+	gotoxy(x + Xinterval, y);
+	printf("                  ");
 	gotoxy(x + Xinterval, y);
 	printf("Gold  : %d", player->m_iGold);
 	gotoxy(x, ++y);
+	printf("                  ");
+	gotoxy(x, y);
 	printf("Shield : %d (+%d)", player->m_iOriShield, player->m_iShield - player->m_iOriShield);
 	gotoxy(x, ++y);
+	printf("                  ");
+	gotoxy(x, y);
 	printf("Card   : %d", player->m_iCard - player->m_iHandCard);
+	gotoxy(x + Xinterval, y);
+	printf("                  ");
 	gotoxy(x + Xinterval, y);
 	printf("Cost   : %d / %d", player->m_iCost, player->m_iMaxCost);
 
@@ -164,6 +180,7 @@ int CheckWithCard(CPlayer* player, CCard card)
 	int iDmg = card.m_iDmg + player->m_iForce;
 	player->m_iUseCardType = card.m_iCardType;
 	PrintStoryMessage(card.m_chCardName, " (을)를 사용했다.");
+	Sleep(1000);
 
 	switch (card.m_iCardType)
 	{
@@ -197,11 +214,13 @@ int CheckWithCard(CPlayer* player, CCard card)
 
 		sprintf(temp, "%d", iDmg);
 		PrintStoryMessage(temp, " 장 (을)를 뽑았다.");
+		Sleep(1000);
 		break;
 	case PLUSCOST:
 		player->m_iCost += card.m_iCost * 2;
 		sprintf(temp, "%d", card.m_iCost);
 		PrintStoryMessage(temp, " 만큼 Cost (을)를 획득했다.");
+		Sleep(1000);
 		break;
 	default:
 		break;
@@ -212,36 +231,42 @@ int CheckWithCard(CPlayer* player, CCard card)
 		++iCheckAtt;
 		sprintf(temp, "%d", iDmg);
 		PrintStoryMessage(temp, " 만큼 공격했다.");
+		Sleep(1000);
 	}
 	if (card.m_iShield != 0)
 	{
 		++iCheckAtt;
 		sprintf(temp, "%d", card.m_iShield);
 		PrintStoryMessage(temp, " 만큼 Shield(방어력) (을)를 얻었다.");
+		Sleep(1000);
 	}
 	if (card.m_iDebuffForce != 0)
 	{
 		++iCheckAtt;
 		sprintf(temp, "%d", card.m_iDebuffForce);
 		PrintStoryMessage(temp, " 만큼 상대의 Str(힘) (을)를 감소시켰다.");
+		Sleep(1000);
 	}
 	if (card.m_iDebuffShield != 0)
 	{
 		++iCheckAtt;
 		sprintf(temp, "%d", card.m_iDebuffShield);
 		PrintStoryMessage(temp, " 만큼 상대의 Shield(방어력) (을)를 감소시켰다.");
+		Sleep(1000);
 	}
 	if (card.m_iBuffForce != 0)
 	{
 		++iCheckAtt;
 		sprintf(temp, "%d", card.m_iBuffForce);
 		PrintStoryMessage(temp, " 만큼 Str(힘) (을)를 얻었다.");
+		Sleep(1000);
 	}
 	if (card.m_iBuffHP != 0)
 	{
 		++iCheckAtt;
 		sprintf(temp, "%d", card.m_iBuffHP);
 		PrintStoryMessage(temp, " 만큼 HP(체력) (을)를 얻었다");
+		Sleep(1000);
 	}
 
 	if (iCheckAtt)
@@ -322,7 +347,7 @@ void AddNewCard(CCard* handarr[], CCard* allcard, int cnt, int maxcardcnt, int c
 int PlayerDeadReturn(CPlayer* player)
 {
 	if (player->m_iHP <= 0)
-		return 0;
+		return 1;
 
 	return 0;
 }
@@ -330,7 +355,7 @@ int PlayerDeadReturn(CPlayer* player)
 void PlayerNewTurn(CPlayer* player)
 {
 	player->m_iForce = player->m_iOriForce;
-	player->m_iShield = player->m_iOriShield;
+	//player->m_iShield = player->m_iOriShield;
 	player->m_iMaxHP = player->m_iOriMaxHp;
 	player->m_iCost = player->m_iMaxCost;
 
@@ -406,4 +431,38 @@ FIGHTACT SetPlayerFightInfo(CPlayer* player)
 void ClearPlayerFightInfo(CPlayer* player)
 {
 	memset(&(player->m_FightInfo), 0, sizeof(FIGHTACT));
+}
+
+void PlayerRestHP(CPlayer* player)
+{
+	player->m_iHP = player->m_iMaxHP;
+}
+
+char itoc[2];
+
+char* ReturnIntToChar(int a)
+{
+	sprintf(itoc, "%d", a);
+
+	return itoc;
+}
+
+void AddCard(int num)
+{
+	PrintStoryMessage(ReturnIntToChar(num), " ) 카드 추가");
+}
+
+void RecoveryHP(int num)
+{
+	PrintStoryMessage(ReturnIntToChar(num), " ) 체력 회복");
+}
+
+void AddMaxHP(int num)
+{
+	PrintStoryMessage(ReturnIntToChar(num), " ) 최대 체력 증가");
+}
+
+void AddForce(int num)
+{
+	PrintStoryMessage(ReturnIntToChar(num), " ) 힘 증가");
 }

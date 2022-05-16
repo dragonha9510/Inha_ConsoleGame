@@ -15,13 +15,12 @@ typedef struct monster
 int			SetFightInfoToMonster(CMonster* monster, FIGHTACT fight);
 FIGHTACT	GetMonsterFightInfo(CMonster* monster);
 CMonster*	MakeMonster(int hp, int shield, int dmg, int gold);
-
+void		MonsterInfoRender(CMonster* monster);
 
 
 int SetFightInfoToMonster(CMonster* monster, FIGHTACT fight)
 {
 	monster->m_iShield = monster->m_iShield < 0 ? 0 : monster->m_iShield - fight.GiveDebuffShield;
-
 
 	if (monster->m_iShield < fight.GiveDmg)
 	{
@@ -70,4 +69,37 @@ CMonster* MakeMonster(int hp, int shield, int dmg, int gold)
 	pMonster->m_FightInfo.GiveDmg = pMonster->m_iDmg;
 
 	return pMonster;
+}
+
+#define MONSTERSTATEX 110
+#define MONSTERSTATEY 3
+
+void MonsterInfoRender(CMonster* monster)
+{
+	int monsterPos = MONSTERSTATEY;
+
+	gotoxy(MONSTERSTATEX, monsterPos);
+	printf("Monster State");
+
+	gotoxy(MONSTERSTATEX, ++monsterPos);
+	printf("Dmg    : %d", monster->m_iDmg);
+
+	gotoxy(MONSTERSTATEX, ++monsterPos);
+	printf("Shiled : %d", monster->m_iShield);
+
+	gotoxy(MONSTERSTATEX, ++monsterPos);
+	printf("HP     : %d", monster->m_iHP);
+}
+
+void MonsterInfoRenderClear()
+{
+	int monsterPos = MONSTERSTATEY;
+	gotoxy(MONSTERSTATEX, monsterPos);
+	printf("             ");
+	gotoxy(MONSTERSTATEX, ++monsterPos);
+	printf("            ");
+	gotoxy(MONSTERSTATEX, ++monsterPos);
+	printf("            ");
+	gotoxy(MONSTERSTATEX, ++monsterPos);
+	printf("            ");
 }
