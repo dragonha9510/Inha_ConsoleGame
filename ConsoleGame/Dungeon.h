@@ -139,13 +139,8 @@ int InitDungeon(CDungeon* dungeon)
 
 int DungeonUpdate(CDungeon* dungeon)
 {
-	if (MAXSTAGESTORY - iStoryCnt == 9)
-	{
-		gotoxy(2, 2);
-		printf("              ");
-	}
 	gotoxy(2, 2);
-	printf("남은 이야기 %d", MAXSTAGESTORY - iStoryCnt);
+	printf("남은 이야기 %d   ", MAXSTAGESTORY - iStoryCnt);
 
 	if (!dungeon->m_bActiveStory)
 	{

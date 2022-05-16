@@ -146,7 +146,7 @@ int PlayerBaseRender(CPlayer* player)
 	gotoxy(x, ++y);
 	printf("                  ");
 	gotoxy(x, y);
-	printf("Str    : %d (+%d)", player->m_iOriForce, player->m_iForce - player->m_iOriForce);
+	printf("Str  : %d (+%d)", player->m_iOriForce, player->m_iForce - player->m_iOriForce);
 	gotoxy(x + Xinterval, y);
 	printf("                  ");
 	gotoxy(x + Xinterval, y);
@@ -451,22 +451,22 @@ char* ReturnIntToChar(int a)
 
 void AddCard(int num)
 {
-	PrintStoryMessage(ReturnIntToChar(num), " ) 카드 추가");
+	PrintStoryMessage(ReturnIntToChar(num), " ) 카드 추가 - 50g");
 }
 
 void RecoveryHP(int num)
 {
-	PrintStoryMessage(ReturnIntToChar(num), " ) 체력 회복");
+	PrintStoryMessage(ReturnIntToChar(num), " ) 체력 회복 - 10g");
 }
 
 void AddMaxHP(int num)
 {
-	PrintStoryMessage(ReturnIntToChar(num), " ) 최대 체력 증가");
+	PrintStoryMessage(ReturnIntToChar(num), " ) 최대 체력 증가 - 20g");
 }
 
 void AddForce(int num)
 {
-	PrintStoryMessage(ReturnIntToChar(num), " ) 힘 증가");
+	PrintStoryMessage(ReturnIntToChar(num), " ) 힘 증가 - 1g");
 }
 
 void InteractionWithShop(CPlayer* player, int num)
@@ -476,6 +476,12 @@ void InteractionWithShop(CPlayer* player, int num)
 	switch (num)
 	{
 	case ADDCARD:
+		if (player->m_iGold < 50)
+		{
+			PrintStoryMessage("골드가 ", "부족하다.. 구매할 수 없다..");
+			break;
+		}
+		player->m_iGold -= 50;
 		player->m_iCard += 1;
 		TempRealloc = player->m_pCard;
 		player->m_pCard = (CCard*)realloc(player->m_pCard, sizeof(CCard) * player->m_iCard);
@@ -489,13 +495,31 @@ void InteractionWithShop(CPlayer* player, int num)
 		PlayerCardAddOne((player->m_pCard + player->m_iCard - 1), player->m_pAllCard, MAXCARDKINDS);
 		break;
 	case ADDFORCE:
+		if (player->m_iGold < 1)
+		{
+			PrintStoryMessage("골드가 ", "부족하다.. 구매할 수 없다..");
+			break;
+		}
+		player->m_iGold -= 1;
 		player->m_iForce += 5;
 		player->m_iOriForce += 5;
 		break;
 	case ADDMAXHP:
+		if (player->m_iGold < 20)
+		{
+			PrintStoryMessage("골드가 ", "부족하다.. 구매할 수 없다..");
+			break;
+		}
+		player->m_iGold -= 20;
 		player->m_iMaxHP += 50;
 		break;
 	case RECOVERYHP:
+		if (player->m_iGold < 10)
+		{
+			PrintStoryMessage("골드가 ", "부족하다.. 구매할 수 없다..");
+			break;
+		}
+		player->m_iGold -= 10;
 		player->m_iHP = player->m_iMaxHP;
 		break;
 	}

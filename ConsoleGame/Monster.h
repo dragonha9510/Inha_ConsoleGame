@@ -95,11 +95,11 @@ void MonsterInfoRenderClear()
 {
 	int monsterPos = MONSTERSTATEY;
 	gotoxy(MONSTERSTATEX, monsterPos);
-	printf("             ");
+	printf("                ");
 	gotoxy(MONSTERSTATEX, ++monsterPos);
-	printf("            ");
+	printf("               ");
 	gotoxy(MONSTERSTATEX, ++monsterPos);
-	printf("            ");
+	printf("               ");
 	gotoxy(MONSTERSTATEX, ++monsterPos);
-	printf("            ");
+	printf("               ");
 }
