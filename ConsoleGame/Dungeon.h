@@ -12,7 +12,7 @@
 #define STORYCURSORY	27
 #define STORYINTERVAL	20
 
-#define MONSTERMAX		20
+#define MONSTERMAX		33
 
 #define ENDTURN			0
 #define CHOOSE1			1
@@ -126,8 +126,12 @@ int InitDungeon(CDungeon* dungeon)
 
 	for (int i = 0; i < MONSTERMAX; ++i)
 	{
-		if(NULLCHECKRETURN(dungeon->m_pMonsterList[i]))
+		if (NULLCHECKRETURN(dungeon->m_pMonsterList[i]))
+		{
 			dungeon->m_pMonsterList[i] = MakeMonster(10 * (i + 1), 5 * (i + 1), 5 * (i + 1), 5 * (i + 1));
+			dungeon->m_pMonsterList[++i] = MakeMonster(10 * (i), 5 * (i), 5 * (i), 5 * (i));
+			dungeon->m_pMonsterList[++i] = MakeMonster(10 * (i - 1), 5 * (i - 1), 5 * (i - 1), 5 * (i - 1));
+		}
 	}
 
 	return _OK;
@@ -270,6 +274,7 @@ int DungeonUpdate(CDungeon* dungeon)
 	if (MonsterDeadReturn(dungeon->m_pMonsterList[dungeon->m_iMonsterCnt]))
 	{
 		PrintStoryMessage("(NULL) (은)는", "몬스터 (을)를 상대로 승리했다.");
+		dungeon->m_pPlayer->m_iGold += dungeon->m_pMonsterList[dungeon->m_iMonsterCnt]->m_iGold;
 		++dungeon->m_iMonsterCnt;
 		dungeon->m_bMonsterDie = true;
 		dungeon->m_bMeetMonster = false;
@@ -279,7 +284,28 @@ int DungeonUpdate(CDungeon* dungeon)
 	{
 		if (0 <= dungeon->m_iChooseNum && dungeon->m_iChooseNum < 3)
 		{
+			void* vFuncp = vp[dungeon->m_iChooseNum];
 
+			if (vFuncp == AddForce)
+			{
+				InteractionWithShop(dungeon->m_pPlayer, ADDFORCE);
+			}
+			else if (vFuncp == AddMaxHP)
+			{
+				InteractionWithShop(dungeon->m_pPlayer, ADDMAXHP);
+			}
+			else if (vFuncp == AddCard)
+			{
+				InteractionWithShop(dungeon->m_pPlayer, ADDCARD);
+			}
+			else
+			{
+				InteractionWithShop(dungeon->m_pPlayer, RECOVERYHP);
+			}
+
+			PlayerBaseRender(dungeon->m_pPlayer);
+
+			dungeon->m_iChooseNum = -1;
 		}
 	}
 

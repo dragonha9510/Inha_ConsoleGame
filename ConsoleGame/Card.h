@@ -38,11 +38,11 @@ typedef struct Card
 	char m_chCardInfo[MAXBUFFER];
 }CCard;
 
-int InitPlayerCard(CCard* playercard, CCard* allcard, int cnt, int MaxCardNum)
+int InitPlayerCard(CCard* playercard, CCard* allcard, int cnt, int maxcardnum)
 {
 	int iMaximum = 0;
 
-	for (int i = 0; i < MaxCardNum; ++i)
+	for (int i = 0; i < maxcardnum; ++i)
 		iMaximum += (allcard + i)->m_iPercent;
 
 	for (int i = 0; i < cnt; ++i)
@@ -50,7 +50,7 @@ int InitPlayerCard(CCard* playercard, CCard* allcard, int cnt, int MaxCardNum)
 		int iCardNum = rand() % iMaximum;
 		int iPercent = 0;
 
-		for (int j = 0; j < MaxCardNum; ++j)
+		for (int j = 0; j < maxcardnum; ++j)
 		{
 			iPercent += (*(allcard + j)).m_iPercent;
 			if (iCardNum < iPercent)
@@ -59,6 +59,30 @@ int InitPlayerCard(CCard* playercard, CCard* allcard, int cnt, int MaxCardNum)
 				iPercent = 0;
 				break;
 			}
+		}
+	}
+
+	return _TRUE;
+}
+
+int PlayerCardAddOne(CCard* playercard, CCard* allcard, int maxcardnum)
+{
+	int iMaximum = 0;
+
+	for (int i = 0; i < maxcardnum; ++i)
+		iMaximum += (allcard + i)->m_iPercent;
+
+	int iCardNum = rand() % iMaximum;
+	int iPercent = 0;
+
+	for (int i = 0; i < maxcardnum; ++i)
+	{
+		iPercent += (*(allcard + i)).m_iPercent;
+		if (iCardNum < iPercent)
+		{
+			*playercard = *(allcard + i);
+			iPercent = 0;
+			break;
 		}
 	}
 

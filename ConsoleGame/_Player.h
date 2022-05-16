@@ -15,6 +15,8 @@
 #define HANDCOUNT			5
 #define HANDCARDMAX			10
 
+enum SHOPINTERACTION { ADDCARD, ADDFORCE, ADDMAXHP, RECOVERYHP, INTERACTIONEND };
+
 int arr[HANDCARDMAX] = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
 
 typedef struct Player
@@ -57,8 +59,8 @@ void		ShuffleNewCard(CCard* handarr[], CCard* allcard, int cnt, int maxcardcnt);
 void		AddNewCard(CCard* handarr[], CCard* allcard, int cnt, int maxcardcnt, int curcnt);
 void		PlayerNewTurn(CPlayer* player);
 void		ClearPlayerFightInfo(CPlayer* player);
-void		ResetPlayerFightInfo(CPlayer* player);
 void		PlayerRestHP(CPlayer* player);
+void		InteractionWithShop(CPlayer* player, int num);
 int			CheckWithCard(CPlayer* player, CCard card);
 int			SetFightInfoToPlayer(CPlayer* player, FIGHTACT fight);
 FIGHTACT	SetPlayerFightInfo(CPlayer* player);
@@ -355,11 +357,11 @@ int PlayerDeadReturn(CPlayer* player)
 void PlayerNewTurn(CPlayer* player)
 {
 	player->m_iForce = player->m_iOriForce;
-	//player->m_iShield = player->m_iOriShield;
-	player->m_iMaxHP = player->m_iOriMaxHp;
 	player->m_iCost = player->m_iMaxCost;
-
 	player->m_iHandCard = HANDCOUNT;
+
+	if(player->m_iHP > player->m_iMaxHP)
+		player->m_iHP = player->m_iMaxHP;
 
 	for (int i = 0; i < HANDCARDMAX; ++i)
 	{
@@ -465,4 +467,36 @@ void AddMaxHP(int num)
 void AddForce(int num)
 {
 	PrintStoryMessage(ReturnIntToChar(num), " ) 힘 증가");
+}
+
+void InteractionWithShop(CPlayer* player, int num)
+{
+	CCard* TempRealloc = NULL;
+
+	switch (num)
+	{
+	case ADDCARD:
+		player->m_iCard += 1;
+		TempRealloc = player->m_pCard;
+		player->m_pCard = (CCard*)realloc(player->m_pCard, sizeof(CCard) * player->m_iCard);
+
+		if (NULLCHECKRETURN(player->m_pCard))
+		{
+			NULLCHECKFREE(TempRealloc);
+			printf("여기서 메인프로그래스까지 종료하러 가야함");
+		}
+
+		PlayerCardAddOne((player->m_pCard + player->m_iCard - 1), player->m_pAllCard, MAXCARDKINDS);
+		break;
+	case ADDFORCE:
+		player->m_iForce += 5;
+		player->m_iOriForce += 5;
+		break;
+	case ADDMAXHP:
+		player->m_iMaxHP += 50;
+		break;
+	case RECOVERYHP:
+		player->m_iHP = player->m_iMaxHP;
+		break;
+	}
 }

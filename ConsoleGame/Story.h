@@ -70,8 +70,6 @@ bool ShopStory()
 	int iSel = 0;
 	PrintStoryMessage("----- Shop", " -----");
 
-	void* vp = NULL;
-
 	for (int i = 0; i < 3; ++i)
 	{
 		iSel = rand() % 4;
@@ -79,15 +77,19 @@ bool ShopStory()
 		switch (iSel)
 		{
 		case 0:
+			vp[i] = AddCard;
 			func(AddCard, i + 1);
 			break;
 		case 1:
+			vp[i] = AddForce;
 			func(AddForce, i + 1);
 			break;
 		case 2:
+			vp[i] = AddMaxHP;
 			func(AddMaxHP, i + 1);
 			break;
 		default:
+			vp[i] = RecoveryHP;
 			func(RecoveryHP, i + 1);
 			break;
 		}

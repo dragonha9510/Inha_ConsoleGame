@@ -17,6 +17,7 @@
 
 extern HANDLE g_CIN = 0;		// console Input
 extern HANDLE g_COUT = 0;		// console Output
+extern void* vp[3] = {NULL};
 
 #define ESCAPE		27
 #define LEFT		75
